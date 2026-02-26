@@ -37,6 +37,7 @@ npm start
 
 ## API Endpoint
 POST /api/agent
+
 Body:
 {
   "message": "Hello"
@@ -44,4 +45,4 @@ Body:
 
 ## Author
 
-Backend Developer focused on Node.js and AI integration.
+Wesley Turio Backend Developer focused on Node.js and AI integration.
