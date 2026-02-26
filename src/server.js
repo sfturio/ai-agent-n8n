@@ -14,11 +14,12 @@ const __dirname = path.dirname(__filename);
 // middlewares
 app.use(express.json());
 
-// servir HTML/CSS/JS
-app.use(express.static(path.join(__dirname, "..", "public")));
+// servir HTML/CSS/JS (public fica na raiz do projeto)
+const publicDir = path.join(__dirname, "..", "public");
+app.use(express.static(publicDir));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+  res.sendFile(path.join(publicDir, "index.html"));
 });
 
 // rotas da API
@@ -31,7 +32,7 @@ app.get("/health", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-// Render/Docker: escutar em 0.0.0.0 pra aceitar conexões externas
+// Render/Docker: escutar em 0.0.0.0
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
