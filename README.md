@@ -1,19 +1,15 @@
-# AI Agent (Node.js + n8n) — Web UI
+AI Agent with Node.js and n8n
 
-Projeto simples de agente com:
+Features:
 
-- Backend em Node.js (Express)
-- Interface web (HTML/CSS/JS)
-- Integração via n8n (Webhook → HTTP Request)
+• Web interface
+• Backend API with Express
+• n8n automation integration
+• Webhook processing
 
-## Requisitos
+Tech:
 
-- Node.js 18+
-
-## Como rodar
-
-1. Instale dependências:
-
-```bash
-npm install
-```
+• Node.js
+• Express
+• n8n
+• JavaScript
