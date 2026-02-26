@@ -47,27 +47,36 @@ async function sendMessage() {
       body: JSON.stringify({ message: text }),
     });
 
-    const data = await res.json();
+    // tenta JSON, mas se vier texto, mostra o texto
+    const raw = await res.text();
+    let data;
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      data = { reply: raw };
+    }
 
     if (typingEl?.isConnected) typingEl.remove();
 
-    if (!res.ok || !data.ok) {
+    // aqui o importante: NÃO exigir data.ok
+    if (!res.ok) {
       addMessage(data?.error || "Erro ao falar com o agente", "bot");
       return;
     }
 
-    let reply;
+    // aceita vários formatos:
+    // 1) { reply: "..." }
+    // 2) { data: { reply: "..." } }
+    // 3) { ok: true, data: "..." }
+    // 4) qualquer outro JSON -> stringify
+    let reply =
+      data?.reply ??
+      data?.data?.reply ??
+      (typeof data?.data === "string" ? data.data : null);
 
-    if (typeof data.data === "string") {
-      reply = data.data;
-    } else if (data.data?.reply) {
-      reply = data.data.reply;
-    } else {
-      reply = JSON.stringify(data.data, null, 2);
-    }
+    if (!reply) reply = JSON.stringify(data, null, 2);
 
     addMessage(reply || "Não recebi resposta do agente.", "bot");
-
   } catch (err) {
     if (typingEl?.isConnected) typingEl.remove();
     addMessage("Erro de conexão com o servidor.", "bot");
@@ -81,16 +90,16 @@ async function sendMessage() {
 // EVENTOS
 //
 
-// impede reload da página
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   sendMessage();
 });
 
-// botão
-button.addEventListener("click", sendMessage);
+button.addEventListener("click", (e) => {
+  e.preventDefault();
+  sendMessage();
+});
 
-// Enter
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
