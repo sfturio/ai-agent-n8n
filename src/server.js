@@ -22,9 +22,9 @@ app.get("/", (req, res) => {
 });
 
 // rotas da API
-app.use("/api", agentRoutes);
+app.use("/api/agent", agentRoutes);
 
-// healthcheck 
+// healthcheck
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });

@@ -3,6 +3,6 @@ import { handleAgent } from "../controllers/agent.controller.js";
 
 const router = Router();
 
-router.post("/agent", handleAgent);
+router.post("/", handleAgent);
 
 export default router;
