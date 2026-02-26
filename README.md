@@ -1,48 +1,104 @@
-# AI Agent Backend with n8n Integration
+# AI Agent – Node.js + n8n
 
-Backend service built with Node.js and Express that integrates with n8n workflows using webhooks to process AI agent requests.
+A modular backend AI agent integrated with n8n workflows and exposed through a REST API, with a simple web-based chat interface for testing.
 
-## Features
-- Express backend API
-- Modular architecture (routes, controllers, services)
-- n8n webhook integration
-- Environment variable configuration
-- Scalable backend structure
+---
+
+## Overview
+
+This project implements a clean backend architecture that connects a chat interface to an automation workflow (n8n) acting as the AI processing layer.
+
+The goal was to build and deploy a real backend application, handle production issues, and structure the project in a scalable way.
+
+---
+
+## Architecture
+
+Client (Chat UI)  
+→ POST /agent  
+→ Route  
+→ Controller  
+→ Service Layer  
+→ n8n Webhook  
+→ JSON Response  
+
+---
 
 ## Tech Stack
+
+### Backend
 - Node.js
-- Express.js
-- n8n
-- dotenv
+- Express
+- JavaScript (ESModules)
+
+### Automation
+- n8n (Webhook-based workflow engine)
+
+### Frontend
+- HTML
+- CSS
+- Vanilla JavaScript
+
+### Deployment
+- Render
+
+### Version Control
+- Git
+- GitHub
+
+---
 
 ## Project Structure
-src/
-  server.js
-  routes/
-  controllers/
-  services/
 
-## Installation
-Clone the repository:
-git clone https://github.com/sfturio/ai-agent-n8n.git
-Install dependencies:
-npm install
-Create .env file:
+```
+server.js
+routes/
+  agent.routes.js
+controllers/
+  agent.controller.js
+services/
+  agent.service.js
+```
 
-N8N_WEBHOOK_URL=your_webhook_url
-PORT=3000
+---
 
-Start the server:
-npm start
+## Features
 
-## API Endpoint
-POST /api/agent
+- REST API endpoint (`POST /agent`)
+- Layered architecture (Route → Controller → Service)
+- Async webhook communication
+- JSON-based responses
+- Proper HTTP status codes (200, 400, 500)
+- Simple real-time chat interface
+- Production deployment
 
-Body:
-{
-  "message": "Hello"
-}
+---
 
-## Author
+## Key Concepts Applied
 
-Wesley Turio Backend Developer focused on Node.js and AI integration.
+- Separation of concerns
+- Modular routing
+- Async/await best practices
+- Input validation
+- Error handling strategies
+- Clean project structure
+
+---
+
+## Issues Resolved During Development
+
+- Fixed 500 Internal Server Errors caused by unhandled async logic
+- Standardized Express Router configuration
+- Corrected `package.json` start script and Node engine setup for production
+- Restructured Git repository after remote misconfiguration
+- Improved frontend handling for failed API responses
+
+---
+
+## What This Project Demonstrates
+
+- Building a structured backend application
+- Integrating external automation systems (n8n)
+- Debugging production-level issues
+- Deploying a live Node.js application
+- Managing a clean and organized project with Git
