@@ -1,3 +1,4 @@
+import axios from "axios";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -10,23 +11,38 @@ export async function processMessage(message) {
   }
 
   try {
-    const response = await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message }),
-    });
+    const response = await axios.post(
+      WEBHOOK_URL,
+      { message },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        timeout: 10000, // evita travar indefinidamente
+      }
+    );
 
-    if (!response.ok) {
-      throw new Error(`Webhook request failed with status ${response.status}`);
+    return response.data;
+
+  } catch (error) {
+    // 🔎 Tratamento profissional de erro axios
+    if (error.response) {
+      console.error("n8n responded with error:", {
+        status: error.response.status,
+        data: error.response.data,
+      });
+
+      throw new Error(
+        `n8n error ${error.response.status}: ${JSON.stringify(error.response.data)}`
+      );
     }
 
-    const data = await response.json();
+    if (error.request) {
+      console.error("No response received from n8n webhook");
+      throw new Error("No response from n8n webhook");
+    }
 
-    return data;
-  } catch (error) {
-    console.error("n8n service error:", error.message);
-    throw error;
+    console.error("Axios config error:", error.message);
+    throw new Error(`Axios error: ${error.message}`);
   }
 }
