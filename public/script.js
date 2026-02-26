@@ -17,6 +17,8 @@ function addMessage(text, sender) {
   chat.appendChild(div);
 
   chat.scrollTop = chat.scrollHeight;
+
+  return div; // pra poder remover depois (typing...)
 }
 
 //
@@ -24,24 +26,32 @@ function addMessage(text, sender) {
 //
 async function sendMessage() {
   const text = input.value.trim();
-
   if (!text) return;
 
   addMessage(text, "me");
   input.value = "";
+  input.focus();
+
+  // UI: bloqueia enquanto envia
+  button.disabled = true;
+  input.disabled = true;
+
+  // UI: "digitando..."
+  const typingEl = addMessage("Digitando...", "bot");
 
   try {
     const res = await fetch("/api/agent", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),
     });
 
+    // tenta ler json; se falhar, cai no catch
     const data = await res.json();
 
-    // verifica se backend retornou erro
+    // remove "digitando..."
+    typingEl.remove();
+
     if (!res.ok || !data.ok) {
       addMessage(data?.error || "Erro ao falar com o agente", "bot");
       return;
@@ -58,10 +68,14 @@ async function sendMessage() {
       reply = JSON.stringify(data.data, null, 2);
     }
 
-    addMessage(reply, "bot");
-
+    addMessage(reply || "Não recebi resposta do agente.", "bot");
   } catch (err) {
+    // remove "digitando..." se ainda existir
+    if (typingEl?.isConnected) typingEl.remove();
     addMessage("Erro de conexão com o servidor.", "bot");
+  } finally {
+    button.disabled = false;
+    input.disabled = false;
   }
 }
 
@@ -71,26 +85,13 @@ async function sendMessage() {
 button.onclick = sendMessage;
 
 input.onkeydown = (e) => {
-  if (e.key === "Enter") {
-    sendMessage();
-  }
+  if (e.key === "Enter") sendMessage();
 };
 
 //
 // MENSAGENS INICIAIS
 //
-setTimeout(() => {
-  addMessage("Olá 👋", "bot");
-}, 400);
-
-setTimeout(() => {
-  addMessage("Sou seu assistente virtual.", "bot");
-}, 900);
-
-setTimeout(() => {
-  addMessage("Posso ajudar com treinos, objetivos e dúvidas.", "bot");
-}, 1500);
-
-setTimeout(() => {
-  addMessage("Qual é seu principal objetivo hoje?", "bot");
-}, 2100);
+setTimeout(() => addMessage("Olá 👋", "bot"), 400);
+setTimeout(() => addMessage("Sou seu assistente virtual.", "bot"), 900);
+setTimeout(() => addMessage("Posso ajudar com treinos, objetivos e dúvidas.", "bot"), 1500);
+setTimeout(() => addMessage("Qual é seu principal objetivo hoje?", "bot"), 2100);

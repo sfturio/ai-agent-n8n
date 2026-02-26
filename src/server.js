@@ -4,8 +4,15 @@ import agentRoutes from "./routes/agent.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
+dotenv.config();
+
+const app = express();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// middlewares
+app.use(express.json());
 
 // servir HTML/CSS/JS
 app.use(express.static(path.join(__dirname, "..", "public")));
@@ -14,28 +21,15 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "public", "index.html"));
 });
 
-dotenv.config();
+// rotas da API
+app.use("/api", agentRoutes);
 
-const app = express();
-
-const PORT = process.env.PORT || 3000;
-
-// middlewares
-app.use(express.json());
-
-// routes
-app.use("/api/agent", agentRoutes);
-
-// health check endpoint
+// healthcheck 
 app.get("/health", (req, res) => {
-  res.json({
-    ok: true,
-    service: "ai-agent",
-    status: "running",
-  });
+  res.json({ ok: true });
 });
 
-// start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`AI Agent server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
