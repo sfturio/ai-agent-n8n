@@ -116,8 +116,15 @@ function typeMessage(
       // ao terminar, se for bot, troca o conteúdo para markdown renderizado
       if (finalizeMarkdown && sender === "bot") {
         const bubble = div.querySelector(".bubble");
-        bubble.innerHTML = `<div class="md">${renderMarkdown(text)}</div>`;
-        chat.scrollTop = chat.scrollHeight;
+
+        // fade-out rápido
+        bubble.style.opacity = "0";
+
+        setTimeout(() => {
+          bubble.innerHTML = `<div class="md">${renderMarkdown(text)}</div>`;
+          bubble.style.opacity = "1";
+          chat.scrollTop = chat.scrollHeight;
+        }, 120);
       }
     }
   }, speed);

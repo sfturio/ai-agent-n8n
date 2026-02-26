@@ -217,3 +217,12 @@ button:hover {
   display: block;
   margin: 6px 0;
 }
+
+/* Evita salto e mantém quebras durante o typewriter */
+.bubble {
+  transition: opacity 0.12s ease;
+}
+
+.bubble .text {
+  white-space: pre-wrap; /* mantém \n enquanto digita */
+}
