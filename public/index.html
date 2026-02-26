@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agente Chat</title>
     <link rel="stylesheet" href="./style.css" />
+    <script src="./script.js" defer></script>
   </head>
+
   <body>
     <div class="wrap">
       <div class="shell">
@@ -14,7 +16,7 @@
             <div class="logo"></div>
             <div>
               <div><strong>Agente Chat</strong></div>
-              <div style="opacity:.7;font-size:12px;">Conectado ao backend</div>
+              <div style="opacity: 0.7; font-size: 12px">Conectado ao backend</div>
             </div>
           </div>
           <div class="status"><span class="dot"></span><span>Online</span></div>
@@ -22,13 +24,15 @@
 
         <div id="chat" class="chat"></div>
 
-        <form id="form" class="composer">
-          <input id="input" placeholder="Digite sua mensagem..." autocomplete="off" />
-          <button type="submit">Enviar</button>
+        <form id="form" class="composer" autocomplete="off">
+          <input
+            id="input"
+            placeholder="Digite sua mensagem..."
+            autocomplete="off"
+          />
+          <button id="send" type="submit">Enviar</button>
         </form>
       </div>
     </div>
-
-    <script src="./script.js"></script>
   </body>
 </html>
