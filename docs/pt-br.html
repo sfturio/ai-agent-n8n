@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Agent n8n – Documento Técnico</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-top">
+          <h1>AI Agent – Documento Técnico</h1>
+
+          <a href="index.html" class="lang-btn"> 🇺🇸 English </a>
+        </div>
+
+        <p class="subtitle">Node.js + Express + Integração com n8n</p>
+
+        <p class="meta">
+          Autor: Wesley Turio |
+          <a href="https://github.com/sfturio/ai-agent-n8n" target="_blank">
+            Ver Repositório
+          </a>
+        </p>
+      </header>
+
+      <section class="preview-section">
+  <h2>Prévia da Aplicação</h2>
+  <img src="images/agente.png" alt="Interface do Chat do Agente" class="preview-image" />
+</section>
+
+      <section>
+        <h2>1. Stack Tecnológica</h2>
+
+        <h3>Backend</h3>
+        <ul>
+          <li>Node.js</li>
+          <li>Express</li>
+          <li>JavaScript (ESModules)</li>
+          <li>Arquitetura em camadas (routes, controllers, services)</li>
+        </ul>
+
+        <h3>Integração</h3>
+        <ul>
+          <li>n8n (engine de automação via webhook)</li>
+        </ul>
+
+        <h3>Frontend (Interface de Teste)</h3>
+        <ul>
+          <li>HTML</li>
+          <li>CSS</li>
+          <li>JavaScript puro (manipulação de DOM)</li>
+        </ul>
+
+        <h3>Deploy</h3>
+        <ul>
+          <li>Render</li>
+          <li>Git & GitHub</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>2. Arquitetura</h2>
+
+        <div class="code-block">
+          Frontend → POST /agent → Controller → Service → Webhook n8n → JSON
+          Response
+        </div>
+
+        <h3>Estrutura do Projeto</h3>
+        <div class="code-block">
+          server.js routes/ agent.routes.js controllers/ agent.controller.js
+          services/ agent.service.js
+        </div>
+      </section>
+
+      <section>
+        <h2>3. Conceitos Aplicados</h2>
+        <ul>
+          <li>Separação de responsabilidades</li>
+          <li>Roteamento modular</li>
+          <li>Controle de fluxo com async/await</li>
+          <li>Validação de inputs</li>
+          <li>Códigos HTTP (200, 400, 500)</li>
+          <li>Estratégias de tratamento de erros</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>4. Funcionalidades Implementadas</h2>
+        <ul>
+          <li>Endpoint REST (POST /agent)</li>
+          <li>Arquitetura backend em camadas</li>
+          <li>Comunicação assíncrona com webhook</li>
+          <li>Respostas em JSON</li>
+          <li>Interface web estilo chat para testes</li>
+          <li>Deploy em ambiente de produção</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>5. Principais Bugs e Correções</h2>
+
+        <h3>Erro 500 (Internal Server Error)</h3>
+        <ul>
+          <li>Lógica assíncrona não tratada corretamente</li>
+          <li>Retorno inconsistente no service</li>
+          <li>Validação de resposta do webhook</li>
+        </ul>
+
+        <h3>Problemas com Router</h3>
+        <ul>
+          <li>Padronização do uso do Express Router</li>
+        </ul>
+
+        <h3>Problemas de Deploy (Render)</h3>
+        <ul>
+          <li>Ajuste do start script no package.json</li>
+          <li>Configuração correta da versão do Node</li>
+        </ul>
+
+        <h3>Limpeza do Repositório Git</h3>
+        <ul>
+          <li>Remoção de remote duplicado</li>
+          <li>Reorganização de commits</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>6. Resultado</h2>
+        <ul>
+          <li>Backend modular funcional</li>
+          <li>Integração com workflow externo (n8n)</li>
+          <li>Deploy ativo</li>
+          <li>Experiência real com debugging em produção</li>
+        </ul>
+      </section>
+
+      <footer>
+        <p>© AI Agent n8n – Documentação Técnica</p>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,158 @@
+body {
+  margin: 0;
+  background-color: #0f1117;
+  color: #e6e6e6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
+  line-height: 1.6;
+}
+
+/* Container */
+
+.container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+/* Header */
+
+header {
+  margin-bottom: 50px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+/* Language Button */
+
+.lang-btn {
+  background-color: #1a1f2b;
+  border: 1px solid #2a2f3a;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #e6e6e6;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+  background-color: #2a2f3a;
+  border-color: #4ea1ff;
+  color: #4ea1ff;
+  text-decoration: none;
+}
+
+/* Subtitle & Meta */
+
+.subtitle {
+  color: #9da5b4;
+  margin-bottom: 5px;
+}
+
+.meta {
+  font-size: 14px;
+  color: #7a8194;
+}
+
+/* Links */
+
+a {
+  color: #4ea1ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Sections */
+
+section {
+  margin-bottom: 50px;
+}
+
+h2 {
+  border-bottom: 1px solid #2a2f3a;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+h3 {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #b0b7c3;
+}
+
+/* Lists */
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+/* Code Block */
+
+.code-block {
+  background-color: #1a1f2b;
+  padding: 15px;
+  border-radius: 8px;
+  font-family: monospace;
+  margin-bottom: 20px;
+  white-space: pre-wrap;
+  border: 1px solid #2a2f3a;
+}
+
+/* Footer */
+
+footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid #2a2f3a;
+  font-size: 14px;
+  color: #7a8194;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  .container {
+    margin: 40px auto;
+  }
+}
+
+/* Preview Image */
+
+.preview-section {
+  margin-bottom: 50px;
+}
+
+.preview-image {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #2a2f3a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  margin-top: 15px;
+}

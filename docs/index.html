@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Agent n8n – Technical Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-top">
+          <h1>AI Agent – Technical Document</h1>
+
+          <a href="pt-br.html" class="lang-btn"> 🇧🇷 Português </a>
+        </div>
+
+        <p class="subtitle">Node.js + Express + n8n Integration</p>
+
+        <p class="meta">
+          Author: Wesley Turio |
+          <a href="https://github.com/sfturio/ai-agent-n8n" target="_blank">
+            View Repository
+          </a>
+        </p>
+      </header>
+
+      <section class="preview-section">
+  <h2>Application Preview</h2>
+  <img src="images/agente.png" alt="AI Agent Chat Interface" class="preview-image" />
+</section>
+
+      <section>
+        <h2>1. Tech Stack</h2>
+
+        <h3>Backend</h3>
+        <ul>
+          <li>Node.js</li>
+          <li>Express</li>
+          <li>JavaScript (ESModules)</li>
+          <li>Layered structure (routes, controllers, services)</li>
+        </ul>
+
+        <h3>Integration</h3>
+        <ul>
+          <li>n8n (Webhook automation engine)</li>
+        </ul>
+
+        <h3>Frontend (Testing Interface)</h3>
+        <ul>
+          <li>HTML</li>
+          <li>CSS</li>
+          <li>Vanilla JavaScript (DOM manipulation)</li>
+        </ul>
+
+        <h3>Deployment</h3>
+        <ul>
+          <li>Render</li>
+          <li>Git & GitHub</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>2. Architecture</h2>
+
+        <div class="code-block">
+          Frontend → POST /agent → Controller → Service → n8n Webhook → JSON
+          Response
+        </div>
+
+        <h3>Project Structure</h3>
+        <div class="code-block">
+          server.js routes/ agent.routes.js controllers/ agent.controller.js
+          services/ agent.service.js
+        </div>
+      </section>
+
+      <section>
+        <h2>3. Concepts Applied</h2>
+        <ul>
+          <li>Separation of concerns</li>
+          <li>Modular routing</li>
+          <li>Async/await flow control</li>
+          <li>Input validation patterns</li>
+          <li>HTTP status codes (200, 400, 500)</li>
+          <li>Error handling strategies</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>4. Features Implemented</h2>
+        <ul>
+          <li>REST API endpoint (POST /agent)</li>
+          <li>Layered backend architecture</li>
+          <li>Async webhook communication</li>
+          <li>JSON-based responses</li>
+          <li>Web chat interface for testing</li>
+          <li>Production deployment</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>5. Important Bugs & Fixes</h2>
+
+        <h3>Internal Server Error (500)</h3>
+        <ul>
+          <li>Unhandled async logic</li>
+          <li>Inconsistent service return</li>
+          <li>Webhook response validation</li>
+        </ul>
+
+        <h3>Router Configuration Issues</h3>
+        <ul>
+          <li>Standardized Express Router usage</li>
+        </ul>
+
+        <h3>Deployment Issues (Render)</h3>
+        <ul>
+          <li>Adjusted start script</li>
+          <li>Configured Node engine properly</li>
+        </ul>
+
+        <h3>Git Repository Cleanup</h3>
+        <ul>
+          <li>Removed duplicate remotes</li>
+          <li>Restructured commit history</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>6. Result</h2>
+        <ul>
+          <li>Working modular backend agent</li>
+          <li>External workflow integration via n8n</li>
+          <li>Live deployment</li>
+          <li>Real debugging experience</li>
+        </ul>
+      </section>
+
+      <footer>
+        <p>© AI Agent n8n – Technical Documentation</p>
+      </footer>
+    </div>
+  </body>
+</html>
