@@ -2,50 +2,72 @@ const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const button = document.getElementById("send");
 
+//
+// ADICIONAR MENSAGEM NA TELA
+//
 function addMessage(text, sender) {
   const div = document.createElement("div");
-
   div.className = `msg ${sender}`;
 
   const bubble = document.createElement("div");
-
   bubble.className = "bubble";
-
   bubble.textContent = text;
 
   div.appendChild(bubble);
-
   chat.appendChild(div);
 
   chat.scrollTop = chat.scrollHeight;
 }
 
+//
+// ENVIAR MENSAGEM PARA O BACKEND
+//
 async function sendMessage() {
   const text = input.value.trim();
 
   if (!text) return;
 
   addMessage(text, "me");
-
   input.value = "";
 
-  const res = await fetch("/chat", {
-    method: "POST",
+  try {
+    const res = await fetch("/api/agent", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: text }),
+    });
 
-    headers: {
-      "Content-Type": "application/json",
-    },
+    const data = await res.json();
 
-    body: JSON.stringify({
-      message: text,
-    }),
-  });
+    // verifica se backend retornou erro
+    if (!res.ok || !data.ok) {
+      addMessage(data?.error || "Erro ao falar com o agente", "bot");
+      return;
+    }
 
-  const data = await res.json();
+    // pega resposta do n8n
+    let reply;
 
-  addMessage(data.reply, "bot");
+    if (typeof data.data === "string") {
+      reply = data.data;
+    } else if (data.data?.reply) {
+      reply = data.data.reply;
+    } else {
+      reply = JSON.stringify(data.data, null, 2);
+    }
+
+    addMessage(reply, "bot");
+
+  } catch (err) {
+    addMessage("Erro de conexão com o servidor.", "bot");
+  }
 }
 
+//
+// EVENTOS
+//
 button.onclick = sendMessage;
 
 input.onkeydown = (e) => {
@@ -57,7 +79,6 @@ input.onkeydown = (e) => {
 //
 // MENSAGENS INICIAIS
 //
-
 setTimeout(() => {
   addMessage("Olá 👋", "bot");
 }, 400);

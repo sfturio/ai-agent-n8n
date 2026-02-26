@@ -1,10 +1,9 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agente Chat</title>
-
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -13,29 +12,23 @@
         <div class="topbar">
           <div class="brand">
             <div class="logo"></div>
-
-            <div class="title">
-              <h1>Agente Chat</h1>
-              <p>Conectado ao backend</p>
+            <div>
+              <div><strong>Agente Chat</strong></div>
+              <div style="opacity:.7;font-size:12px;">Conectado ao backend</div>
             </div>
           </div>
-
-          <div class="status">
-            <div class="dot"></div>
-            Online
-          </div>
+          <div class="status"><span class="dot"></span><span>Online</span></div>
         </div>
 
         <div id="chat" class="chat"></div>
 
-        <div class="composer">
-          <input id="input" placeholder="Digite sua mensagem..." />
-
-          <button id="send">Enviar</button>
-        </div>
+        <form id="form" class="composer">
+          <input id="input" placeholder="Digite sua mensagem..." autocomplete="off" />
+          <button type="submit">Enviar</button>
+        </form>
       </div>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="./script.js"></script>
   </body>
 </html>
