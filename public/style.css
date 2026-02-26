@@ -178,3 +178,42 @@ button:hover {
     transform: translateY(0);
   }
 }
+
+/* Melhor formatação do texto do bot */
+.bot .bubble {
+  max-width: 78%;
+}
+
+.md {
+  white-space: normal;
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+.md strong {
+  font-weight: 700;
+}
+
+.md code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.md ul,
+.md ol {
+  margin: 10px 0 10px 18px;
+  padding: 0;
+}
+
+.md li {
+  margin: 6px 0;
+}
+
+.md br {
+  content: "";
+  display: block;
+  margin: 6px 0;
+}

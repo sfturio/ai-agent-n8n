@@ -4,7 +4,7 @@ const button = document.getElementById("send");
 const form = document.getElementById("form");
 
 //
-// ADICIONAR MENSAGEM NA TELA
+// ADICIONAR MENSAGEM NA TELA (texto puro)
 //
 function addMessage(text, sender) {
   const div = document.createElement("div");
@@ -27,16 +27,77 @@ function addMessage(text, sender) {
 }
 
 //
-// TYPEWRITER
+// MARKDOWN (básico, seguro)
+//
+function escapeHtml(str) {
+  return str
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderMarkdown(md) {
+  let html = escapeHtml(md);
+
+  // code inline
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+
+  // bold / italic
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+
+  // listas com "-"
+  html = html.replace(/(?:^|\n)- (.+)(?=\n|$)/g, "\n<li>$1</li>");
+  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (m) => `<ul>${m}</ul>`);
+
+  // lista numerada (simples)
+  html = html.replace(/(?:^|\n)\d+\. (.+)(?=\n|$)/g, "\n<li>$1</li>");
+  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (m) => {
+    if (m.includes("<ul>")) return m; // já virou ul
+    return `<ol>${m}</ol>`;
+  });
+
+  // quebra de linha
+  html = html.replace(/\n/g, "<br />");
+
+  return html;
+}
+
+function addBotMessageMarkdown(text) {
+  const div = document.createElement("div");
+  div.className = "msg bot";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+
+  bubble.innerHTML = `<div class="md">${renderMarkdown(text)}</div>`;
+
+  div.appendChild(bubble);
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+
+  return div;
+}
+
+//
+// TYPEWRITER (com opção de finalizar em markdown)
 //
 let activeTypeTimer = null;
 
-function typeMessage(text, sender, speed = 12) {
+function typeMessage(
+  text,
+  sender,
+  speed = 12,
+  { finalizeMarkdown = false } = {},
+) {
   if (activeTypeTimer) {
     clearInterval(activeTypeTimer);
     activeTypeTimer = null;
   }
 
+  // escreve como texto puro (mais simples/estável), depois troca pra markdown
   const div = addMessage("", sender);
   const span = div.querySelector(".bubble .text");
 
@@ -51,6 +112,13 @@ function typeMessage(text, sender, speed = 12) {
     if (i >= text.length) {
       clearInterval(activeTypeTimer);
       activeTypeTimer = null;
+
+      // ao terminar, se for bot, troca o conteúdo para markdown renderizado
+      if (finalizeMarkdown && sender === "bot") {
+        const bubble = div.querySelector(".bubble");
+        bubble.innerHTML = `<div class="md">${renderMarkdown(text)}</div>`;
+        chat.scrollTop = chat.scrollHeight;
+      }
     }
   }, speed);
 
@@ -71,11 +139,11 @@ async function sendMessage() {
   button.disabled = true;
   input.disabled = true;
 
-  // ===== Typing indicator =====
+  // Typing indicator
   const typingEl = addMessage("", "bot");
-  const bubble = typingEl.querySelector(".bubble");
+  const typingBubble = typingEl.querySelector(".bubble");
 
-  bubble.innerHTML = `
+  typingBubble.innerHTML = `
     <div class="typing">
       <span></span>
       <span></span>
@@ -86,9 +154,7 @@ async function sendMessage() {
   try {
     const res = await fetch("/api/agent", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),
     });
 
@@ -104,7 +170,9 @@ async function sendMessage() {
     if (typingEl?.isConnected) typingEl.remove();
 
     if (!res.ok) {
-      typeMessage(data?.error || "Erro ao falar com o agente.", "bot", 10);
+      typeMessage(data?.error || "Erro ao falar com o agente.", "bot", 12, {
+        finalizeMarkdown: false,
+      });
       return;
     }
 
@@ -115,10 +183,15 @@ async function sendMessage() {
 
     if (!reply) reply = JSON.stringify(data, null, 2);
 
-    typeMessage(reply || "Não recebi resposta do agente.", "bot", 10);
+    // Bot: typewriter e ao final aplica markdown (fica bem formatado)
+    typeMessage(reply || "Não recebi resposta do agente.", "bot", 10, {
+      finalizeMarkdown: true,
+    });
   } catch (err) {
     if (typingEl?.isConnected) typingEl.remove();
-    typeMessage("Erro de conexão com o servidor.", "bot", 10);
+    typeMessage("Erro de conexão com o servidor.", "bot", 12, {
+      finalizeMarkdown: false,
+    });
   } finally {
     button.disabled = false;
     input.disabled = false;
@@ -146,15 +219,15 @@ input.addEventListener("keydown", (e) => {
 });
 
 //
-// MENSAGENS INICIAIS
+// MENSAGENS INICIAIS (renderizadas em markdown pra já ficar bonito)
 //
-setTimeout(() => addMessage("Olá 👋", "bot"), 400);
-setTimeout(() => addMessage("Sou seu assistente virtual.", "bot"), 900);
+setTimeout(() => addBotMessageMarkdown("Olá 👋"), 400);
+setTimeout(() => addBotMessageMarkdown("Sou seu assistente virtual."), 900);
 setTimeout(
-  () => addMessage("Posso ajudar com treinos, objetivos e dúvidas.", "bot"),
-  1500
+  () => addBotMessageMarkdown("Posso ajudar com treinos, objetivos e dúvidas."),
+  1500,
 );
 setTimeout(
-  () => addMessage("Qual é seu principal objetivo hoje?", "bot"),
-  2100
+  () => addBotMessageMarkdown("Qual é seu principal objetivo hoje?"),
+  2100,
 );
