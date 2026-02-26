@@ -12,12 +12,47 @@ function addMessage(text, sender) {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.textContent = text;
 
+  const span = document.createElement("span");
+  span.className = "text";
+  span.textContent = text;
+
+  bubble.appendChild(span);
   div.appendChild(bubble);
   chat.appendChild(div);
 
   chat.scrollTop = chat.scrollHeight;
+
+  return div;
+}
+
+//
+// TYPEWRITER
+//
+let activeTypeTimer = null;
+
+function typeMessage(text, sender, speed = 12) {
+  if (activeTypeTimer) {
+    clearInterval(activeTypeTimer);
+    activeTypeTimer = null;
+  }
+
+  const div = addMessage("", sender);
+  const span = div.querySelector(".bubble .text");
+
+  let i = 0;
+
+  activeTypeTimer = setInterval(() => {
+    span.textContent += text[i] ?? "";
+    i++;
+
+    chat.scrollTop = chat.scrollHeight;
+
+    if (i >= text.length) {
+      clearInterval(activeTypeTimer);
+      activeTypeTimer = null;
+    }
+  }, speed);
 
   return div;
 }
@@ -36,7 +71,17 @@ async function sendMessage() {
   button.disabled = true;
   input.disabled = true;
 
-  const typingEl = addMessage("Digitando...", "bot");
+  // ===== Typing indicator =====
+  const typingEl = addMessage("", "bot");
+  const bubble = typingEl.querySelector(".bubble");
+
+  bubble.innerHTML = `
+    <div class="typing">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  `;
 
   try {
     const res = await fetch("/api/agent", {
@@ -47,8 +92,8 @@ async function sendMessage() {
       body: JSON.stringify({ message: text }),
     });
 
-    // tenta JSON, mas se vier texto, mostra o texto
     const raw = await res.text();
+
     let data;
     try {
       data = raw ? JSON.parse(raw) : {};
@@ -58,17 +103,11 @@ async function sendMessage() {
 
     if (typingEl?.isConnected) typingEl.remove();
 
-    // aqui o importante: NÃO exigir data.ok
     if (!res.ok) {
-      addMessage(data?.error || "Erro ao falar com o agente", "bot");
+      typeMessage(data?.error || "Erro ao falar com o agente.", "bot", 10);
       return;
     }
 
-    // aceita vários formatos:
-    // 1) { reply: "..." }
-    // 2) { data: { reply: "..." } }
-    // 3) { ok: true, data: "..." }
-    // 4) qualquer outro JSON -> stringify
     let reply =
       data?.reply ??
       data?.data?.reply ??
@@ -76,10 +115,10 @@ async function sendMessage() {
 
     if (!reply) reply = JSON.stringify(data, null, 2);
 
-    addMessage(reply || "Não recebi resposta do agente.", "bot");
+    typeMessage(reply || "Não recebi resposta do agente.", "bot", 10);
   } catch (err) {
     if (typingEl?.isConnected) typingEl.remove();
-    addMessage("Erro de conexão com o servidor.", "bot");
+    typeMessage("Erro de conexão com o servidor.", "bot", 10);
   } finally {
     button.disabled = false;
     input.disabled = false;
@@ -89,7 +128,6 @@ async function sendMessage() {
 //
 // EVENTOS
 //
-
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   sendMessage();
@@ -112,5 +150,11 @@ input.addEventListener("keydown", (e) => {
 //
 setTimeout(() => addMessage("Olá 👋", "bot"), 400);
 setTimeout(() => addMessage("Sou seu assistente virtual.", "bot"), 900);
-setTimeout(() => addMessage("Posso ajudar com treinos, objetivos e dúvidas.", "bot"), 1500);
-setTimeout(() => addMessage("Qual é seu principal objetivo hoje?", "bot"), 2100);
+setTimeout(
+  () => addMessage("Posso ajudar com treinos, objetivos e dúvidas.", "bot"),
+  1500
+);
+setTimeout(
+  () => addMessage("Qual é seu principal objetivo hoje?", "bot"),
+  2100
+);
