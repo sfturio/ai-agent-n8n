@@ -1,16 +1,29 @@
 
-AI Agent – Node.js + n8n 
+# AI Agent – Node.js + n8n
+
+![Node.js](https://img.shields.io/badge/Node.js-18+-green)
+![Express](https://img.shields.io/badge/Express-Framework-lightgrey)
+![n8n](https://img.shields.io/badge/n8n-Workflow-orange)
+![Deploy](https://img.shields.io/badge/Deploy-Render-blue)
+![License](https://img.shields.io/badge/Status-Production-success)
 
 A modular backend AI agent integrated with n8n workflows and exposed through a REST API, including a lightweight web-based chat interface.
 
-🔗 Live Demo: https://ai-agent-n8n-zefs.onrender.com
-📄 Technical Documentation: https://sfturio.github.io/ai-agent-n8n/
-Overview
+🔗 **Live Demo:** https://ai-agent-n8n-zefs.onrender.com  
+📄 **Technical Documentation:** https://sfturio.github.io/ai-agent-n8n/
 
-Structured backend application that connects a chat interface to an n8n automation workflow acting as the AI processing layer.
+---
 
-Designed with production-oriented practices and clean architecture principles.
-Architecture
+## Overview
+
+Structured backend application connecting a web chat interface to an n8n automation workflow acting as the AI processing layer.
+
+Built following clean architecture principles and production-oriented practices.
+
+---
+
+## Architecture
+
 
 Client (Chat UI)
 ↓
@@ -25,94 +38,96 @@ Service
 n8n Webhook
 ↓
 JSON Response
-API
-POST /agent
 
-Request
 
+---
+
+## API
+
+### POST /agent
+
+**Request**
+
+```json
 {
-“message”: “Hello AI”
+  "message": "Hello AI"
 }
 
 Success (200)
 
 {
-“ok”: true,
-“data”: “AI response”
+  "ok": true,
+  "data": "AI response"
 }
 
 Errors
 
-    400 → Invalid input
+400 → Invalid input
 
-    500 → Internal server error
+500 → Internal server error
 
 Tech Stack
-
 Backend
 
-    Node.js
+Node.js
 
-    Express
+Express
 
-    JavaScript (ESModules)
+JavaScript (ESModules)
 
 Automation
 
-    n8n (Webhook workflows)
+n8n (Webhook workflows)
 
 Frontend
 
-    HTML
+HTML
 
-    CSS
+CSS
 
-    Vanilla JavaScript
+Vanilla JavaScript
 
 Deployment
 
-    Render
+Render
 
 Version Control
 
-    Git
+Git
 
-    GitHub
+GitHub
 
 Project Structure
-
 server.js
 routes/
-agent.routes.js
+  agent.routes.js
 controllers/
-agent.controller.js
+  agent.controller.js
 services/
-agent.service.js
+  agent.service.js
 Environment Variables
-
 PORT=3000
 N8N_WEBHOOK_URL=https://your-n8n-instance/webhook/agent
 Features
 
-    Layered architecture (Route → Controller → Service)
+Layered architecture (Route → Controller → Service)
 
-    Async webhook integration
+Async webhook integration
 
-    Structured JSON responses
+Structured JSON responses
 
-    Proper HTTP status handling
+Proper HTTP status handling
 
-    Production deployment
+Production deployment
 
 Demonstrates
 
-    Clean backend architecture
+Clean backend architecture
 
-    External system integration
+External system integration
 
-    Production debugging
+Production debugging
 
-    Scalable project structure
+Scalable project structure
 
-    REST API best practices
-
+REST API best practices
