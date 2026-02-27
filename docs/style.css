@@ -16,15 +16,15 @@
 }
 
 .theme-dark {
-  --bg: #0b1020;       /* fundo mais profundo */
-  --text: #eaf0ff;     /* texto mais claro */
-  --muted: #a8b3cf;    /* muted mais visível */
+  --bg: #0b1020; /* fundo mais profundo */
+  --text: #eaf0ff; /* texto mais claro */
+  --muted: #a8b3cf; /* muted mais visível */
   --border: #22304a;
 
   /* MAIS VIVO */
   --card: #111a33;
-  --link: #4ea1ff;     /* azul vivo */
-  --accent: #a78bfa;   /* roxo vivo */
+  --link: #4ea1ff; /* azul vivo */
+  --accent: #a78bfa; /* roxo vivo */
   --accent-2: #22d3ee; /* ciano vivo */
 
   --code-bg: #0a1226;
@@ -98,7 +98,11 @@ a:hover {
 
 /* Buttons */
 .btn {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.08));
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.08)
+  );
   border: 1px solid var(--border);
   color: var(--text);
   padding: 7px 12px;
@@ -142,7 +146,12 @@ h2::after {
   bottom: -1px;
   width: 120px;
   height: 2px;
-  background: linear-gradient(90deg, var(--link), var(--accent), var(--accent-2));
+  background: linear-gradient(
+    90deg,
+    var(--link),
+    var(--accent),
+    var(--accent-2)
+  );
 }
 
 h3 {
@@ -171,7 +180,8 @@ li {
   color: var(--code-text);
   padding: 14px;
   border-radius: 12px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
   border: 1px solid rgba(255, 255, 255, 0.08);
   white-space: pre-wrap;
@@ -245,4 +255,38 @@ footer {
   .preview-image {
     width: 100%;
   }
+}
+
+.hero {
+  margin: 10px 0 30px; /* menos espaço acima */
+}
+
+.hero-role {
+  font-size: 15px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.hero-links {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--link);
+  text-decoration: none;
+}
+
+.hero-link:hover {
+  text-decoration: underline;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
 }
