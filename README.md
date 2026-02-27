@@ -48,56 +48,49 @@ JSON Response
 
 **Request**
 
+```
+**Request**
+
 ```json
 {
   "message": "Hello AI"
 }
-
+```
 Success (200)
-
+```
 {
   "ok": true,
   "data": "AI response"
 }
+```
 
-Errors
+Errors:
 
-400 → Invalid input
+- 400 → Invalid input
+- 500 → Internal server error
 
-500 → Internal server error
-
-Tech Stack
-Backend
-
-Node.js
-
-Express
-
-JavaScript (ESModules)
-
-Automation
-
-n8n (Webhook workflows)
-
-Frontend
-
-HTML
-
-CSS
-
-Vanilla JavaScript
-
-Deployment
-
-Render
-
-Version Control
-
-Git
-
-GitHub
-
-Project Structure
+## Tech Stack
+**Backend**
+- Node.js
+- Express
+- JavaScript (ESModules)
+  
+**Automation**
+- n8n (Webhook workflows)
+  
+**Frontend**
+- HTML
+- CSS
+- Vanilla JavaScript
+  
+**Deployment**
+- Render
+  
+**Version Control**
+- Git
+- GitHub
+## Project Structure
+```
 server.js
 routes/
   agent.routes.js
@@ -105,29 +98,21 @@ controllers/
   agent.controller.js
 services/
   agent.service.js
-Environment Variables
+```
+## Enviroment Variables
+```
 PORT=3000
 N8N_WEBHOOK_URL=https://your-n8n-instance/webhook/agent
-Features
-
-Layered architecture (Route → Controller → Service)
-
-Async webhook integration
-
-Structured JSON responses
-
-Proper HTTP status handling
-
-Production deployment
-
-Demonstrates
-
-Clean backend architecture
-
-External system integration
-
-Production debugging
-
-Scalable project structure
-
-REST API best practices
+```
+## Features
+- Layered architecture (Route → Controller → Service)
+- Async webhook integration
+- Structured JSON responses
+- Proper HTTP status handling
+- Production deployment
+## Demonstrates
+- Clean backend architecture
+- External system integration
+- Production debugging
+- Scalable project structure
+- REST API best practices
