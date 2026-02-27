@@ -1,3 +1,4 @@
+<!-- pt-br.html (PT-BR) -->
 <!doctype html>
 <html lang="pt-BR">
   <head>
@@ -7,20 +8,30 @@
     <link rel="stylesheet" href="style.css" />
   </head>
 
-  <body>
+  <body class="theme-dark">
     <div class="container">
       <header>
         <div class="header-top">
-          <h1>AI Agent – Documento Técnico</h1>
+          <div>
+            <h1>AI Agent – Documento Técnico</h1>
+            <p class="subtitle">Node.js + Express + Integração com n8n</p>
+          </div>
 
-          <a href="index.html" class="lang-btn"> 🇺🇸 English </a>
+          <div class="header-actions">
+            <button id="themeToggle" class="btn" type="button">
+              Alternar tema
+            </button>
+            <a href="index.html" class="btn btn-link"> 🇺🇸 English </a>
+          </div>
         </div>
-
-        <p class="subtitle">Node.js + Express + Integração com n8n</p>
 
         <p class="meta">
           Autor: Wesley Turio |
-          <a href="https://github.com/sfturio/ai-agent-n8n" target="_blank">
+          <a
+            href="https://github.com/sfturio/ai-agent-n8n"
+            target="_blank"
+            rel="noreferrer"
+          >
             Ver Repositório
           </a>
         </p>
@@ -55,7 +66,7 @@
         <ul>
           <li>HTML</li>
           <li>CSS</li>
-          <li>JavaScript puro (manipulação de DOM)</li>
+          <li>JavaScript puro (DOM)</li>
         </ul>
 
         <h3>Deploy</h3>
@@ -68,15 +79,25 @@
       <section>
         <h2>2. Arquitetura</h2>
 
-        <div class="code-block">
-          Frontend → POST /agent → Controller → Service → Webhook n8n → JSON
-          Response
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copiar</button>
+          <pre class="code-block">
+Frontend → POST /agent → Controller → Service → Webhook n8n → JSON Response</pre
+          >
         </div>
 
         <h3>Estrutura do Projeto</h3>
-        <div class="code-block">
-          server.js routes/ agent.routes.js controllers/ agent.controller.js
-          services/ agent.service.js
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copiar</button>
+          <pre class="code-block">
+server.js
+routes/
+  agent.routes.js
+controllers/
+  agent.controller.js
+services/
+  agent.service.js</pre
+          >
         </div>
       </section>
 
@@ -88,7 +109,7 @@
           <li>Controle de fluxo com async/await</li>
           <li>Validação de inputs</li>
           <li>Códigos HTTP (200, 400, 500)</li>
-          <li>Estratégias de tratamento de erros</li>
+          <li>Tratamento de erros</li>
         </ul>
       </section>
 
@@ -146,5 +167,7 @@
         <p>© AI Agent n8n – Documentação Técnica</p>
       </footer>
     </div>
+
+    <script src="app.js"></script>
   </body>
 </html>

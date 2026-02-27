@@ -1,3 +1,4 @@
+<!-- index.html (EN) -->
 <!doctype html>
 <html lang="en">
   <head>
@@ -7,20 +8,30 @@
     <link rel="stylesheet" href="style.css" />
   </head>
 
-  <body>
+  <body class="theme-dark">
     <div class="container">
       <header>
         <div class="header-top">
-          <h1>AI Agent – Technical Document</h1>
+          <div>
+            <h1>AI Agent – Technical Document</h1>
+            <p class="subtitle">Node.js + Express + n8n Integration</p>
+          </div>
 
-          <a href="pt-br.html" class="lang-btn"> 🇧🇷 Português </a>
+          <div class="header-actions">
+            <button id="themeToggle" class="btn" type="button">
+              Toggle theme
+            </button>
+            <a href="pt-br.html" class="btn btn-link"> 🇧🇷 Português </a>
+          </div>
         </div>
-
-        <p class="subtitle">Node.js + Express + n8n Integration</p>
 
         <p class="meta">
           Author: Wesley Turio |
-          <a href="https://github.com/sfturio/ai-agent-n8n" target="_blank">
+          <a
+            href="https://github.com/sfturio/ai-agent-n8n"
+            target="_blank"
+            rel="noreferrer"
+          >
             View Repository
           </a>
         </p>
@@ -68,15 +79,25 @@
       <section>
         <h2>2. Architecture</h2>
 
-        <div class="code-block">
-          Frontend → POST /agent → Controller → Service → n8n Webhook → JSON
-          Response
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copy</button>
+          <pre class="code-block">
+Frontend → POST /agent → Controller → Service → n8n Webhook → JSON Response</pre
+          >
         </div>
 
         <h3>Project Structure</h3>
-        <div class="code-block">
-          server.js routes/ agent.routes.js controllers/ agent.controller.js
-          services/ agent.service.js
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copy</button>
+          <pre class="code-block">
+server.js
+routes/
+  agent.routes.js
+controllers/
+  agent.controller.js
+services/
+  agent.service.js</pre
+          >
         </div>
       </section>
 
@@ -146,5 +167,7 @@
         <p>© AI Agent n8n – Technical Documentation</p>
       </footer>
     </div>
+
+    <script src="app.js"></script>
   </body>
 </html>
