@@ -1,5 +1,5 @@
 
-AI Agent – Node.js + n8n
+AI Agent – Node.js + n8n 
 
 A modular backend AI agent integrated with n8n workflows and exposed through a REST API, including a lightweight web-based chat interface.
 
