@@ -121,3 +121,9 @@ create table if not exists public.agent_messages (
 ```
 
 After this setup, every `POST /api/agent` call is logged with request/response status.
+
+---
+
+## Changelog
+
+- **2026-03-11**: Migrated persistence from Render managed database to Supabase Postgres to improve data stability and avoid data loss from ephemeral resets.
