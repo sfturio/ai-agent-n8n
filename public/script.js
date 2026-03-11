@@ -33,7 +33,9 @@ function escapeHtml(str) {
 }
 
 function renderMarkdown(md) {
-  let html = escapeHtml(md);
+  // Force numbered lists into dash-style lists to keep a single list format.
+  const normalized = String(md ?? "").replace(/^\s*\d+\.\s+/gm, "- ");
+  let html = escapeHtml(normalized);
 
   html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
   html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
@@ -41,12 +43,6 @@ function renderMarkdown(md) {
 
   html = html.replace(/(?:^|\n)- (.+)(?=\n|$)/g, "\n<li>$1</li>");
   html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (m) => `<ul>${m}</ul>`);
-
-  html = html.replace(/(?:^|\n)\d+\. (.+)(?=\n|$)/g, "\n<li>$1</li>");
-  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (m) => {
-    if (m.includes("<ul>")) return m;
-    return `<ol>${m}</ol>`;
-  });
 
   html = html.replace(/\n/g, "<br />");
 
