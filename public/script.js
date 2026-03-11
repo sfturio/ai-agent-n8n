@@ -33,20 +33,55 @@ function escapeHtml(str) {
 }
 
 function renderMarkdown(md) {
-  // Force numbered lists into dash-style lists to keep a single list format.
-  const normalized = String(md ?? "").replace(/^\s*\d+\.\s+/gm, "- ");
-  let html = escapeHtml(normalized);
+  const escaped = escapeHtml(String(md ?? ""));
+  const lines = escaped.split("\n");
+  const output = [];
+  let activeList = null;
 
-  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  const formatInline = (text) => {
+    let html = text;
+    html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+    html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+    return html;
+  };
 
-  html = html.replace(/(?:^|\n)- (.+)(?=\n|$)/g, "\n<li>$1</li>");
-  html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (m) => `<ul>${m}</ul>`);
+  const closeListIfNeeded = () => {
+    if (activeList === "ul") output.push("</ul>");
+    if (activeList === "ol") output.push("</ol>");
+    activeList = null;
+  };
 
-  html = html.replace(/\n/g, "<br />");
+  for (const line of lines) {
+    const ulMatch = line.match(/^\s*-\s+(.+)$/);
+    const olMatch = line.match(/^\s*\d+\.\s+(.+)$/);
 
-  return html;
+    if (ulMatch) {
+      if (activeList !== "ul") {
+        closeListIfNeeded();
+        output.push("<ul>");
+        activeList = "ul";
+      }
+      output.push(`<li>${formatInline(ulMatch[1])}</li>`);
+      continue;
+    }
+
+    if (olMatch) {
+      if (activeList !== "ol") {
+        closeListIfNeeded();
+        output.push("<ol>");
+        activeList = "ol";
+      }
+      output.push(`<li>${formatInline(olMatch[1])}</li>`);
+      continue;
+    }
+
+    closeListIfNeeded();
+    output.push(formatInline(line));
+  }
+
+  closeListIfNeeded();
+  return output.join("<br />");
 }
 
 function addBotMessageMarkdown(text) {
