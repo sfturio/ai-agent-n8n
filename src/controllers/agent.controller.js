@@ -14,19 +14,17 @@ export async function handleAgent(req, res) {
     }
 
     const normalizedMessage = message.trim();
-    const result = await processMessage(normalizedMessage);
+    const reply = await processMessage(normalizedMessage);
 
     await saveInteractionLog({
       message: normalizedMessage,
-      responseBody: result,
+      responseBody: { reply },
       ok: true,
       errorMessage: null,
     });
 
-    return res.status(200).json({
-      ok: true,
-      data: result,
-    });
+    // Resposta em texto puro para a UI comportar como chat tradicional
+    return res.status(200).type("text/plain; charset=utf-8").send(reply);
   } catch (error) {
     const incomingMessage = typeof req.body?.message === "string" ? req.body.message.trim() : null;
 

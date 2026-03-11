@@ -3,9 +3,6 @@ const input = document.getElementById("input");
 const button = document.getElementById("send");
 const form = document.getElementById("form");
 
-//
-// ADICIONAR MENSAGEM NA TELA (texto puro)
-//
 function addMessage(text, sender) {
   const div = document.createElement("div");
   div.className = `msg ${sender}`;
@@ -26,9 +23,6 @@ function addMessage(text, sender) {
   return div;
 }
 
-//
-// MARKDOWN (básico, seguro)
-//
 function escapeHtml(str) {
   return str
     .replaceAll("&", "&amp;")
@@ -41,25 +35,19 @@ function escapeHtml(str) {
 function renderMarkdown(md) {
   let html = escapeHtml(md);
 
-  // code inline
   html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-  // bold / italic
   html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
-  // listas com "-"
   html = html.replace(/(?:^|\n)- (.+)(?=\n|$)/g, "\n<li>$1</li>");
   html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (m) => `<ul>${m}</ul>`);
 
-  // lista numerada (simples)
   html = html.replace(/(?:^|\n)\d+\. (.+)(?=\n|$)/g, "\n<li>$1</li>");
   html = html.replace(/(<li>[\s\S]*?<\/li>)/g, (m) => {
-    if (m.includes("<ul>")) return m; // já virou ul
+    if (m.includes("<ul>")) return m;
     return `<ol>${m}</ol>`;
   });
 
-  // quebra de linha
   html = html.replace(/\n/g, "<br />");
 
   return html;
@@ -81,9 +69,6 @@ function addBotMessageMarkdown(text) {
   return div;
 }
 
-//
-// TYPEWRITER (com opção de finalizar em markdown)
-//
 let activeTypeTimer = null;
 
 function typeMessage(
@@ -97,7 +82,6 @@ function typeMessage(
     activeTypeTimer = null;
   }
 
-  // escreve como texto puro (mais simples/estável), depois troca pra markdown
   const div = addMessage("", sender);
   const span = div.querySelector(".bubble .text");
 
@@ -113,11 +97,9 @@ function typeMessage(
       clearInterval(activeTypeTimer);
       activeTypeTimer = null;
 
-      // ao terminar, se for bot, troca o conteúdo para markdown renderizado
       if (finalizeMarkdown && sender === "bot") {
         const bubble = div.querySelector(".bubble");
 
-        // fade-out rápido
         bubble.style.opacity = "0";
 
         setTimeout(() => {
@@ -132,9 +114,27 @@ function typeMessage(
   return div;
 }
 
-//
-// ENVIAR MENSAGEM PARA O BACKEND
-//
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed.length > 0) return trimmed;
+    }
+  }
+  return "";
+}
+
+function extractReply(data, raw) {
+  return firstNonEmptyString(
+    data?.reply,
+    data?.message,
+    data?.data?.reply,
+    data?.data?.message,
+    typeof data?.data === "string" ? data.data : "",
+    raw,
+  );
+}
+
 async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
@@ -146,7 +146,6 @@ async function sendMessage() {
   button.disabled = true;
   input.disabled = true;
 
-  // Typing indicator
   const typingEl = addMessage("", "bot");
   const typingBubble = typingEl.querySelector(".bubble");
 
@@ -165,38 +164,35 @@ async function sendMessage() {
       body: JSON.stringify({ message: text }),
     });
 
-    const raw = await res.text();
+    const raw = (await res.text()) || "";
 
-    let data;
+    let data = {};
     try {
       data = raw ? JSON.parse(raw) : {};
     } catch {
-      data = { reply: raw };
+      data = {};
     }
 
     if (typingEl?.isConnected) typingEl.remove();
 
+    const reply = extractReply(data, raw);
+
     if (!res.ok) {
-      typeMessage(data?.error || "Erro ao falar com o agente.", "bot", 12, {
-        finalizeMarkdown: false,
-      });
+      typeMessage(
+        firstNonEmptyString(data?.error, reply, "Erro ao falar com o agente."),
+        "bot",
+        12,
+        { finalizeMarkdown: false },
+      );
       return;
     }
 
-    let reply =
-      data?.reply ??
-      data?.data?.reply ??
-      (typeof data?.data === "string" ? data.data : null);
-
-    if (!reply) reply = JSON.stringify(data, null, 2);
-
-    // Bot: typewriter e ao final aplica markdown (fica bem formatado)
-    typeMessage(reply || "Não recebi resposta do agente.", "bot", 10, {
+    typeMessage(reply || "Nao recebi resposta do agente.", "bot", 10, {
       finalizeMarkdown: true,
     });
   } catch (err) {
     if (typingEl?.isConnected) typingEl.remove();
-    typeMessage("Erro de conexão com o servidor.", "bot", 12, {
+    typeMessage("Erro de conexao com o servidor.", "bot", 12, {
       finalizeMarkdown: false,
     });
   } finally {
@@ -205,9 +201,6 @@ async function sendMessage() {
   }
 }
 
-//
-// EVENTOS
-//
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   sendMessage();
@@ -225,16 +218,7 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
-//
-// MENSAGENS INICIAIS (renderizadas em markdown pra já ficar bonito)
-//
-setTimeout(() => addBotMessageMarkdown("Olá 👋"), 400);
+setTimeout(() => addBotMessageMarkdown("Ola!"), 400);
 setTimeout(() => addBotMessageMarkdown("Sou seu assistente virtual."), 900);
-setTimeout(
-  () => addBotMessageMarkdown("Posso ajudar com treinos, objetivos e dúvidas."),
-  1500,
-);
-setTimeout(
-  () => addBotMessageMarkdown("Qual é seu principal objetivo hoje?"),
-  2100,
-);
+setTimeout(() => addBotMessageMarkdown("Posso ajudar com treinos, objetivos e duvidas."), 1500);
+setTimeout(() => addBotMessageMarkdown("Qual e seu principal objetivo hoje?"), 2100);
