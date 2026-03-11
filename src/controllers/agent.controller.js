@@ -1,4 +1,5 @@
 import { processMessage } from "../services/agent.service.js";
+import { saveInteractionLog } from "../services/supabase-log.service.js";
 
 export async function handleAgent(req, res) {
   try {
@@ -12,13 +13,30 @@ export async function handleAgent(req, res) {
       });
     }
 
-    const result = await processMessage(message.trim());
+    const normalizedMessage = message.trim();
+    const result = await processMessage(normalizedMessage);
+
+    await saveInteractionLog({
+      message: normalizedMessage,
+      responseBody: result,
+      ok: true,
+      errorMessage: null,
+    });
 
     return res.status(200).json({
       ok: true,
       data: result,
     });
   } catch (error) {
+    const incomingMessage = typeof req.body?.message === "string" ? req.body.message.trim() : null;
+
+    await saveInteractionLog({
+      message: incomingMessage,
+      responseBody: null,
+      ok: false,
+      errorMessage: error?.message ?? "unknown error",
+    });
+
     // Log completo no servidor (Render logs)
     console.error("Agent controller error:", {
       message: error?.message,
