@@ -21,13 +21,13 @@ Structured backend application connecting a web chat interface to an n8n automat
 
 ## Architecture
 
-Client (Chat UI) -> POST /agent -> Route -> Controller -> Service -> n8n Webhook -> JSON Response
+Client (Chat UI) -> POST /api/agent -> Route -> Controller -> Service -> n8n Webhook -> JSON Response
 
 ---
 
 ## API
 
-### POST /agent
+### POST /api/agent
 
 Request:
 
@@ -79,14 +79,19 @@ Errors:
 ## Project Structure
 
 ```text
-server.js
-routes/
-  agent.routes.js
-controllers/
-  agent.controller.js
-services/
-  agent.service.js
-  supabase-log.service.js
+src/
+  server.js
+  routes/
+    agent.routes.js
+  controllers/
+    agent.controller.js
+  services/
+    agent.service.js
+    supabase-log.service.js
+public/
+  index.html
+  style.css
+  script.js
 ```
 
 ---
