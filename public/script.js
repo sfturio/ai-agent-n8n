@@ -249,5 +249,7 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
-setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e execucoes dos agentes."), 350);
-setTimeout(() => addBotMessageMarkdown("Envie um ID de execucao para diagnostico rapido."), 900);
+setTimeout(() => addBotMessageMarkdown("Ola!"), 400);
+setTimeout(() => addBotMessageMarkdown("Sou seu assistente virtual."), 900);
+setTimeout(() => addBotMessageMarkdown("Posso ajudar com treinos, objetivos e duvidas."), 1500);
+setTimeout(() => addBotMessageMarkdown("Qual e seu principal objetivo hoje?"), 2100);

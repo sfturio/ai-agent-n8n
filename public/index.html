@@ -1,185 +1,38 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Agent Control Center</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@200..700,0..1,20..48" rel="stylesheet" />
+    <title>Agente Chat</title>
     <link rel="stylesheet" href="./style.css" />
     <script src="./script.js" defer></script>
   </head>
 
   <body>
-    <div class="grain"></div>
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="brand">
-          <div class="brand-logo">
-            <span class="material-symbols-outlined">terminal</span>
-          </div>
-          <div>
-            <p class="brand-title">AI Developer Console</p>
-            <p class="brand-version">v1.0.4</p>
-          </div>
-        </div>
-
-        <nav class="menu">
-          <a class="menu-item is-active" href="#"><span class="material-symbols-outlined">dashboard</span>Dashboard</a>
-          <a class="menu-item" href="#"><span class="material-symbols-outlined">chat_bubble</span>Agent Chat</a>
-          <a class="menu-item" href="#"><span class="material-symbols-outlined">schema</span>Workflows</a>
-          <a class="menu-item" href="#"><span class="material-symbols-outlined">terminal</span>Logs</a>
-          <a class="menu-item" href="#"><span class="material-symbols-outlined">settings</span>Settings</a>
-        </nav>
-
-        <div class="profile-card">
-          <div class="profile-row">
-            <div class="avatar">AR</div>
+    <div class="wrap">
+      <div class="shell">
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo"></div>
             <div>
-              <p class="profile-name">Alex Rivera</p>
-              <p class="profile-plan">Premium Plan</p>
+              <div><strong>Agente Chat</strong></div>
+              <div style="opacity: 0.7; font-size: 12px">Conectado ao backend</div>
             </div>
           </div>
-          <div class="progress"><span></span></div>
+          <div class="status"><span class="dot"></span><span>Online</span></div>
         </div>
-      </aside>
 
-      <main class="main">
-        <header class="topbar">
-          <label class="search-box" for="search">
-            <span class="material-symbols-outlined">search</span>
-            <input id="search" type="text" placeholder="Search deployments, logs, or agents..." />
-          </label>
+        <div id="chat" class="chat"></div>
 
-          <div class="topbar-right">
-            <div class="status-pill"><span class="status-dot"></span>ONLINE</div>
-            <button class="icon-btn" aria-label="Notificações">
-              <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <div class="top-avatar">AR</div>
-          </div>
-        </header>
-
-        <section class="hero">
-          <div>
-            <h1>AI Agent Control Center</h1>
-            <p>Orquestre e monitore seus agentes em tempo real.</p>
-          </div>
-          <button class="run-agent-btn" type="button">
-            <span class="material-symbols-outlined">bolt</span>
-            Run Agent
-          </button>
-        </section>
-
-        <section class="stats-grid">
-          <article class="stat-card">
-            <div class="stat-head">
-              <span class="stat-icon material-symbols-outlined">data_exploration</span>
-              <span class="chip chip-positive">+12%</span>
-            </div>
-            <p class="stat-label">Executions</p>
-            <p class="stat-value">1,248</p>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-head">
-              <span class="stat-icon material-symbols-outlined">verified</span>
-              <span class="chip chip-positive">Optimal</span>
-            </div>
-            <p class="stat-label">Success Rate</p>
-            <p class="stat-value">99.2%</p>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-head">
-              <span class="stat-icon material-symbols-outlined">speed</span>
-              <span class="chip chip-warning">-50ms</span>
-            </div>
-            <p class="stat-label">Response Time</p>
-            <p class="stat-value">450ms</p>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-head">
-              <span class="stat-icon material-symbols-outlined">token</span>
-              <span class="chip">Monthly</span>
-            </div>
-            <p class="stat-label">Token Usage</p>
-            <p class="stat-value">4.2M</p>
-          </article>
-        </section>
-
-        <section class="content-grid">
-          <section class="panel table-panel">
-            <div class="panel-header">
-              <h2>Active Executions</h2>
-              <a href="#">View all logs</a>
-            </div>
-
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>AGENT</th>
-                    <th>STATUS</th>
-                    <th>DURATION</th>
-                    <th>ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="dot dot-info"></span>CustomerSupport_v2</td>
-                    <td><span class="chip chip-running">RUNNING</span></td>
-                    <td>12.4s</td>
-                    <td>#ax-9021</td>
-                  </tr>
-                  <tr>
-                    <td><span class="dot"></span>DataAnalyzer_Bot</td>
-                    <td><span class="chip">SUCCESS</span></td>
-                    <td>45.8s</td>
-                    <td>#ax-8842</td>
-                  </tr>
-                  <tr>
-                    <td><span class="dot dot-error"></span>LeadGen_Script</td>
-                    <td><span class="chip chip-error">ERROR</span></td>
-                    <td>1.2s</td>
-                    <td>#ax-8711</td>
-                  </tr>
-                  <tr>
-                    <td><span class="dot"></span>MarketResearch_v1</td>
-                    <td><span class="chip">SUCCESS</span></td>
-                    <td>122.1s</td>
-                    <td>#ax-8690</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <aside class="panel chat-panel">
-            <div class="chat-head">
-              <div>
-                <span class="dot dot-info"></span>
-                Agent Neural_Alpha
-              </div>
-              <button class="icon-btn" aria-label="Mais opções">
-                <span class="material-symbols-outlined">more_horiz</span>
-              </button>
-            </div>
-
-            <div id="chat" class="chat"></div>
-
-            <form id="form" class="composer" autocomplete="off">
-              <input id="input" placeholder="Type instructions..." autocomplete="off" />
-              <button id="send" type="submit" aria-label="Enviar">
-                <span class="material-symbols-outlined">send</span>
-              </button>
-            </form>
-          </aside>
-        </section>
-      </main>
+        <form id="form" class="composer" autocomplete="off">
+          <input
+            id="input"
+            placeholder="Digite sua mensagem..."
+            autocomplete="off"
+          />
+          <button id="send" type="submit">Enviar</button>
+        </form>
+      </div>
     </div>
   </body>
 </html>
