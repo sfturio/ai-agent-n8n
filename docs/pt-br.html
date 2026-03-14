@@ -1,215 +1,129 @@
-<!-- pt-br.html (PT-BR) -->
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Agent n8n – Documento Técnico</title>
+    <title>AI Agent - Documentação Técnica</title>
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body class="theme-dark">
     <div class="container">
-      <header>
-        <div class="header-top">
-          <div>
-            <h1>AI Agent – Documento Técnico</h1>
-            <p class="subtitle">Node.js + Express + Integração com n8n</p>
-          </div>
-
-          <div class="header-actions">
-            <button id="themeToggle" class="btn" type="button">
-              Alternar tema
-            </button>
-            <a href="index.html" class="btn btn-link"> 🇺🇸 English </a>
-          </div>
+      <header class="top">
+        <div>
+          <h1>AI Agent</h1>
+          <p class="subtitle">Documentação técnica do assistente Node.js + n8n</p>
         </div>
 
-        <p class="meta">
-          Autor: Wesley Turio |
-          <a
-            href="https://github.com/sfturio/ai-agent-n8n"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Ver Repositório
-          </a>
-          |
-          <a
-            href="https://ai-agent-n8n-zefs.onrender.com/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Abrir Projeto Online
-          </a>
-        </p>
+        <div class="actions">
+          <button id="themeToggle" class="btn" type="button">Alternar tema</button>
+          <a href="index.html" class="btn btn-link">EN</a>
+        </div>
       </header>
-      <section class="hero">
-        <div class="hero-links">
-          <a
-            href="https://github.com/sfturio"
-            target="_blank"
-            class="hero-link"
-          >
-            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58 
-        0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-.55-1.4-1.34-1.77-1.34-1.77
-        -1.1-.75.08-.74.08-.74 1.22.09 1.86 1.25 1.86 1.25 1.08 1.85 2.83 1.32 3.52 1.01
-        .11-.78.42-1.32.76-1.63-2.66-.3-5.47-1.33-5.47-5.93 
-        0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.17 
-        0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 
-        3.3-1.23 3.3-1.23.66 1.65.25 2.87.12 3.17 
-        .77.84 1.24 1.91 1.24 3.22 
-        0 4.61-2.81 5.62-5.49 5.92 
-        .43.37.82 1.1.82 2.22 
-        0 1.6-.01 2.89-.01 3.29 
-        0 .32.21.7.83.58A12.01 12.01 0 0 0 24 12 
-        c0-6.63-5.37-12-12-12z"
-              />
-            </svg>
-            GitHub
-          </a>
 
-          <a
-            href="https://www.linkedin.com/in/sfturio/"
-            target="_blank"
-            class="hero-link"
-          >
-            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.05-1.86-3.05
-        -1.86 0-2.14 1.45-2.14 2.95v5.67H9.35V9h3.41v1.56h.05
-        c.48-.9 1.66-1.85 3.42-1.85
-        3.66 0 4.34 2.41 4.34 5.54v6.2zM5.34 7.43
-        a2.06 2.06 0 1 1 0-4.12
-        2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"
-              />
-            </svg>
-            LinkedIn
-          </a>
-        </div>
+      <section class="quick-links">
+        <a href="https://github.com/sfturio/ai-agent-n8n" target="_blank" rel="noreferrer">Repositório</a>
+        <a href="https://ai-agent-n8n-zefs.onrender.com/" target="_blank" rel="noreferrer">Aplicação Online</a>
       </section>
 
       <section>
-        <h2>1. Stack Tecnológica</h2>
-
-        <h3>Backend</h3>
-        <ul>
-          <li>Node.js</li>
-          <li>Express</li>
-          <li>JavaScript (ESModules)</li>
-          <li>Arquitetura em camadas (routes, controllers, services)</li>
-        </ul>
-
-        <h3>Integração</h3>
-        <ul>
-          <li>n8n (engine de automação via webhook)</li>
-        </ul>
-
-        <h3>Frontend (Interface de Teste)</h3>
-        <ul>
-          <li>HTML</li>
-          <li>CSS</li>
-          <li>JavaScript puro (DOM)</li>
-        </ul>
-
-        <h3>Deploy</h3>
-        <ul>
-          <li>Render</li>
-          <li>Git & GitHub</li>
-        </ul>
+        <h2>Visão Geral</h2>
+        <p>
+          O AI Agent é um assistente técnico focado em análise de logs, dúvidas sobre código e contexto operacional.
+          O backend é modular e integra com n8n via webhook. Quando configurado, o histórico de interações é persistido no Supabase.
+        </p>
       </section>
 
       <section>
-        <h2>2. Arquitetura</h2>
-
+        <h2>Arquitetura</h2>
         <div class="code-wrap">
           <button class="copy-btn" type="button">Copiar</button>
-          <pre class="code-block">
-Frontend → POST /agent → Controller → Service → Webhook n8n → JSON Response</pre
-          >
+          <pre class="code-block">UI (public/) -> POST /api/agent -> controller -> service -> webhook n8n
+                          \-> saveInteractionLog -> Supabase</pre>
         </div>
+      </section>
 
-        <h3>Estrutura do Projeto</h3>
+      <section>
+        <h2>API</h2>
+
+        <h3>POST <code>/api/agent</code></h3>
+        <p>Envia uma mensagem para o assistente.</p>
         <div class="code-wrap">
           <button class="copy-btn" type="button">Copiar</button>
-          <pre class="code-block">
-server.js
-routes/
-  agent.routes.js
-controllers/
-  agent.controller.js
-services/
-  agent.service.js</pre
-          >
+          <pre class="code-block">{
+  "message": "Explique este timeout"
+}</pre>
+        </div>
+        <ul>
+          <li><strong>200</strong> <code>text/plain</code>: resposta do agente (inclui fallback quando o n8n está indisponível)</li>
+          <li><strong>400</strong> <code>application/json</code>: entrada inválida</li>
+          <li><strong>500</strong> <code>application/json</code>: erro interno não previsto</li>
+        </ul>
+
+        <h3>GET <code>/health</code></h3>
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copiar</button>
+          <pre class="code-block">{ "ok": true }</pre>
         </div>
       </section>
 
       <section>
-        <h2>3. Conceitos Aplicados</h2>
+        <h2>Variáveis de Ambiente</h2>
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copiar</button>
+          <pre class="code-block">PORT=3000
+N8N_WEBHOOK_URL=https://your-n8n-instance/webhook/agent
+SUPABASE_URL=https://<project-ref>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+SUPABASE_TABLE=agent_messages</pre>
+        </div>
+      </section>
+
+      <section>
+        <h2>Setup Local</h2>
+        <ol>
+          <li>Instalar dependências: <code>npm install</code></li>
+          <li>Configurar <code>.env</code> a partir de <code>.env.example</code></li>
+          <li>Executar aplicação: <code>npm run dev</code></li>
+          <li>Acessar <code>http://localhost:3000</code></li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Tabela no Supabase</h2>
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copiar</button>
+          <pre class="code-block">create table if not exists public.agent_messages (
+  id bigserial primary key,
+  created_at timestamptz not null default now(),
+  message text,
+  response_body jsonb,
+  ok boolean not null default false,
+  error_message text
+);</pre>
+        </div>
+      </section>
+
+      <section>
+        <h2>Resolução de Problemas</h2>
         <ul>
-          <li>Separação de responsabilidades</li>
-          <li>Roteamento modular</li>
-          <li>Controle de fluxo com async/await</li>
-          <li>Validação de inputs</li>
-          <li>Códigos HTTP (200, 400, 500)</li>
-          <li>Tratamento de erros</li>
+          <li><strong>500 no /api/agent:</strong> validar <code>N8N_WEBHOOK_URL</code> e status do webhook no n8n.</li>
+          <li><strong>Sem histórico salvo:</strong> validar credenciais Supabase (<code>SUPABASE_URL</code> e service key).</li>
+          <li><strong>Erro de boot no Render:</strong> confirmar <code>npm start</code> e Node >= 18.</li>
         </ul>
       </section>
 
       <section>
-        <h2>4. Funcionalidades Implementadas</h2>
+        <h2>Mudanças Recentes</h2>
         <ul>
-          <li>Endpoint REST (POST /agent)</li>
-          <li>Arquitetura backend em camadas</li>
-          <li>Comunicação assíncrona com webhook</li>
-          <li>Respostas em JSON</li>
-          <li>Interface web estilo chat para testes</li>
-          <li>Deploy em ambiente de produção</li>
-        </ul>
-      </section>
-
-      <section>
-        <h2>5. Principais Bugs e Correções</h2>
-
-        <h3>Erro 500 (Internal Server Error)</h3>
-        <ul>
-          <li>Lógica assíncrona não tratada corretamente</li>
-          <li>Retorno inconsistente no service</li>
-          <li>Validação de resposta do webhook</li>
-        </ul>
-
-        <h3>Problemas com Router</h3>
-        <ul>
-          <li>Padronização do uso do Express Router</li>
-        </ul>
-
-        <h3>Problemas de Deploy (Render)</h3>
-        <ul>
-          <li>Ajuste do start script no package.json</li>
-          <li>Configuração correta da versão do Node</li>
-        </ul>
-
-        <h3>Limpeza do Repositório Git</h3>
-        <ul>
-          <li>Remoção de remote duplicado</li>
-          <li>Reorganização de commits</li>
-        </ul>
-      </section>
-
-      <section>
-        <h2>6. Resultado</h2>
-        <ul>
-          <li>Backend modular funcional</li>
-          <li>Integração com workflow externo (n8n)</li>
-          <li>Deploy ativo</li>
-          <li>Experiência real com debugging em produção</li>
+          <li><code>v1.1.2</code>: fallback amigável quando o n8n está indisponível.</li>
+          <li><code>v1.1.0</code>: migração de persistência para Supabase.</li>
+          <li><code>v1.0.8</code>: parsing robusto da resposta do webhook.</li>
         </ul>
       </section>
 
       <footer>
-        <p>© AI Agent n8n – Documentação Técnica</p>
+        <p>Documentação do AI Agent</p>
       </footer>
     </div>
 

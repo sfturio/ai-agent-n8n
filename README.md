@@ -1,102 +1,60 @@
-# AI Agent - Node.js + n8n
+﻿# AI Agent
 
-![Node.js](https://img.shields.io/badge/Node.js-18+-green)
-![Express](https://img.shields.io/badge/Express-Framework-lightgrey)
-![n8n](https://img.shields.io/badge/n8n-Workflow-orange)
-![Deploy](https://img.shields.io/badge/Deploy-Render-blue)
-![Status](https://img.shields.io/badge/Status-Production-success)
+Assistente técnico para times de desenvolvimento analisarem logs, código e contexto operacional com suporte de IA.
 
-A modular backend AI agent integrated with n8n workflows and exposed through a REST API, including a lightweight web-based chat interface.
+- Demo: https://ai-agent-n8n-zefs.onrender.com
+- Documentação: https://sfturio.github.io/ai-agent-n8n/
 
-- **Live Demo:** https://ai-agent-n8n-zefs.onrender.com
-- **Technical Documentation:** https://sfturio.github.io/ai-agent-n8n/
+## O que este projeto resolve
 
----
+- Reduz tempo de diagnóstico técnico em chats de suporte interno.
+- Centraliza uma interface simples para análise de logs e perguntas sobre código.
+- Mantém histórico de interações para auditoria e melhoria contínua.
 
-## Overview
+## Stack
 
-Structured backend application connecting a web chat interface to an n8n automation workflow acting as the AI processing layer.
+- Backend: Node.js + Express
+- Orquestração IA: n8n Webhook
+- Persistência: Supabase Postgres
+- Frontend: HTML + CSS + JavaScript
+- Deploy: Render
 
----
+## Arquitetura
 
-## Architecture
+```text
+UI (public/) -> POST /api/agent -> controller -> service -> n8n webhook
+                                    \-> saveInteractionLog (Supabase)
+```
 
-Client (Chat UI) -> POST /api/agent -> Route -> Controller -> Service -> n8n Webhook -> JSON Response
+## Endpoints
 
----
+### `POST /api/agent`
 
-## API
-
-### POST /api/agent
+Envia uma mensagem para o agente.
 
 Request:
 
 ```json
 {
-  "message": "Hello AI"
+  "message": "Explique este erro de timeout"
 }
 ```
 
-Success (200):
+Respostas:
+
+- `200 text/plain`: resposta do agente (inclui fallback amigável quando n8n está indisponível).
+- `400 application/json`: payload inválido.
+- `500 application/json`: erro interno não previsto.
+
+### `GET /health`
+
+Retorna status do serviço:
 
 ```json
-{
-  "ok": true,
-  "data": "AI response"
-}
+{ "ok": true }
 ```
 
-Errors:
-- 400: Invalid input
-- 500: Internal server error
-
----
-
-## Tech Stack
-
-**Backend**
-- Node.js
-- Express
-- JavaScript (ESModules)
-
-**Automation**
-- n8n (Webhook workflows)
-
-**Frontend**
-- HTML
-- CSS
-- Vanilla JavaScript
-
-**Deployment**
-- Render
-
-**Version Control**
-- Git
-- GitHub
-
----
-
-## Project Structure
-
-```text
-src/
-  server.js
-  routes/
-    agent.routes.js
-  controllers/
-    agent.controller.js
-  services/
-    agent.service.js
-    supabase-log.service.js
-public/
-  index.html
-  style.css
-  script.js
-```
-
----
-
-## Environment Variables
+## Variáveis de ambiente
 
 ```env
 PORT=3000
@@ -106,13 +64,26 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 SUPABASE_TABLE=agent_messages
 ```
 
----
+## Setup local
 
-## Supabase Persistence
+1. Instale dependências:
 
-This API can persist each agent interaction in Supabase Postgres, so data is not lost when Render restarts or clears ephemeral storage.
+```bash
+npm install
+```
 
-### Table SQL (run once in Supabase SQL Editor)
+2. Configure `.env` (pode copiar de `.env.example`).
+3. Rode localmente:
+
+```bash
+npm run dev
+```
+
+4. Acesse: `http://localhost:3000`
+
+## Persistência no Supabase
+
+Crie a tabela (uma vez) no SQL Editor:
 
 ```sql
 create table if not exists public.agent_messages (
@@ -125,10 +96,34 @@ create table if not exists public.agent_messages (
 );
 ```
 
-After this setup, every `POST /api/agent` call is logged with request/response status.
+Se `SUPABASE_URL` ou `SUPABASE_SERVICE_ROLE_KEY` não estiverem configurados, o app continua funcionando sem persistência.
 
----
+## Estrutura de pastas
 
-## Changelog
+```text
+src/
+  server.js
+  routes/
+  controllers/
+  services/
+public/
+  index.html
+  style.css
+  script.js
+docs/
+  index.html
+  pt-br.html
+```
 
-- **2026-03-11**: Migrated persistence from Render managed database to Supabase Postgres to improve data stability and avoid data loss from ephemeral resets.
+## Principais decisões técnicas
+
+- Controller retorna texto puro para UX de chat simples.
+- Parsing de resposta do n8n é tolerante a formatos diferentes.
+- Logs de interação não derrubam o fluxo principal do agente.
+- Fallback de resposta mantém disponibilidade da interface quando o n8n oscila.
+
+## Changelog resumido
+
+- `v1.1.2`: fallback amigável em indisponibilidade do n8n.
+- `v1.1.0`: persistência migrada para Supabase Postgres.
+- `v1.0.8`: parsing robusto da resposta do webhook n8n.

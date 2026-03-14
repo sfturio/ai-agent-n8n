@@ -2,6 +2,29 @@ const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const button = document.getElementById("send");
 const form = document.getElementById("form");
+const menuItems = document.querySelectorAll(".side-item[data-view-target]");
+const viewChat = document.getElementById("view-chat");
+const viewChangelog = document.getElementById("view-changelog");
+const viewAbout = document.getElementById("view-about");
+
+function showView(target) {
+  const views = {
+    chat: viewChat,
+    changelog: viewChangelog,
+    about: viewAbout,
+  };
+
+  Object.values(views).forEach((view) => {
+    if (view) view.classList.remove("is-active");
+  });
+
+  const selectedView = views[target] || viewChat;
+  if (selectedView) selectedView.classList.add("is-active");
+
+  menuItems.forEach((item) => {
+    item.classList.toggle("active", item.dataset.viewTarget === target);
+  });
+}
 
 function addMessage(text, sender) {
   const div = document.createElement("div");
@@ -249,7 +272,12 @@ input.addEventListener("keydown", (e) => {
   }
 });
 
-setTimeout(() => addBotMessageMarkdown("Ola!"), 400);
-setTimeout(() => addBotMessageMarkdown("Sou seu assistente virtual."), 900);
-setTimeout(() => addBotMessageMarkdown("Posso ajudar com treinos, objetivos e duvidas."), 1500);
-setTimeout(() => addBotMessageMarkdown("Qual e seu principal objetivo hoje?"), 2100);
+menuItems.forEach((item) => {
+  item.addEventListener("click", (e) => {
+    e.preventDefault();
+    showView(item.dataset.viewTarget);
+  });
+});
+
+setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e comportamento da aplicacao."), 400);
+setTimeout(() => addBotMessageMarkdown("Se quiser, posso detalhar os pontos do changelog ou da arquitetura do projeto."), 950);

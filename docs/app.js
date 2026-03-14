@@ -1,35 +1,31 @@
-// app.js
-function setTheme(theme) {
+﻿function setTheme(theme) {
   const isDark = theme === "dark";
   document.body.classList.toggle("theme-dark", isDark);
-  localStorage.setItem("theme", theme);
+  localStorage.setItem("docs-theme", theme);
 }
 
 function initTheme() {
-  const saved = localStorage.getItem("theme");
-  if (saved === "light" || saved === "dark") {
-    setTheme(saved);
-  } else {
-    setTheme("dark");
-  }
+  const saved = localStorage.getItem("docs-theme");
+  setTheme(saved === "light" ? "light" : "dark");
 }
 
 function initCopyButtons() {
-  document.querySelectorAll(".copy-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const pre = btn.nextElementSibling;
-      if (!pre) return;
+  document.querySelectorAll(".copy-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const block = button.nextElementSibling;
+      if (!block) return;
 
+      const original = button.textContent;
       try {
-        await navigator.clipboard.writeText(pre.innerText);
-        const old = btn.innerText;
-        btn.innerText = "Copied";
-        setTimeout(() => (btn.innerText = old), 1200);
-      } catch (e) {
-        const old = btn.innerText;
-        btn.innerText = "Failed";
-        setTimeout(() => (btn.innerText = old), 1200);
+        await navigator.clipboard.writeText(block.textContent || "");
+        button.textContent = "Copied";
+      } catch {
+        button.textContent = "Failed";
       }
+
+      setTimeout(() => {
+        button.textContent = original;
+      }, 1200);
     });
   });
 }
@@ -39,12 +35,10 @@ window.addEventListener("DOMContentLoaded", () => {
   initCopyButtons();
 
   const toggle = document.getElementById("themeToggle");
-  if (toggle) {
-    toggle.addEventListener("click", () => {
-      const next = document.body.classList.contains("theme-dark")
-        ? "light"
-        : "dark";
-      setTheme(next);
-    });
-  }
+  if (!toggle) return;
+
+  toggle.addEventListener("click", () => {
+    const next = document.body.classList.contains("theme-dark") ? "light" : "dark";
+    setTheme(next);
+  });
 });
