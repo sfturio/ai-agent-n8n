@@ -131,41 +131,45 @@ body {
 }
 
 .topbar {
-  min-height: 64px;
+  min-height: 76px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 26px;
-  background: rgba(15, 19, 29, 0.72);
-  backdrop-filter: blur(12px);
+  align-items: flex-start;
+  padding: 16px 26px 14px;
+  background: rgba(15, 19, 29, 0.5);
+  border-bottom: 1px solid rgba(49, 53, 64, 0.42);
+  backdrop-filter: blur(10px);
 }
 
 .topbar h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   color: #dbe1ee;
-  font-weight: 620;
+  font-weight: 600;
   letter-spacing: -0.015em;
+  line-height: 1.15;
 }
 
 .topbar-title {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
+  min-width: 0;
 }
 
-.topbar-label {
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(198, 198, 204, 0.72);
-  font-weight: 600;
+.topbar-title p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(198, 198, 204, 0.84);
+  max-width: 540px;
 }
 
 .topbar-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  align-self: center;
 }
 
 .icon-btn {
@@ -634,7 +638,22 @@ body {
   }
 
   .topbar {
-    padding: 0 12px;
+    padding: 12px;
+    min-height: 72px;
+  }
+
+  .topbar h2 {
+    font-size: 20px;
+  }
+
+  .topbar-title p {
+    font-size: 11px;
+    max-width: 100%;
+  }
+
+  .status-pill {
+    font-size: 10px;
+    letter-spacing: 0.06em;
   }
 }
 
