@@ -53,7 +53,7 @@
         <header class="topbar">
           <div class="topbar-title">
             <h2>AI Agent Console</h2>
-            <p>Log analysis, code inspection and operational diagnostics.</p>
+            <p>General AI agent portfolio for workflow automation and operational insights.</p>
           </div>
           <div class="topbar-actions">
             <span class="status-pill"><span class="status-dot"></span>NODE_01 CONNECTED</span>
@@ -104,49 +104,50 @@
                 <h3>About Project</h3>
                 <span class="live-pill">PRO</span>
               </div>
-              <h4>AI Agent Developer Assistant</h4>
-              <p class="about-subtitle">Assistente técnico focado em análise operacional e produtividade de times de desenvolvimento.</p>
+              <h4>AI Agent Portfolio Project</h4>
+              <p class="about-subtitle">General AI agent para demonstração de arquitetura web, integração com automação e observabilidade operacional.</p>
 
               <article class="about-block">
                 <h5>Visão Geral</h5>
                 <p>
-                  O AI Agent é um assistente web para interpretar logs, trechos de código e métricas operacionais com velocidade.
-                  A arquitetura usa Node.js + Express no backend, frontend leve em HTML/CSS/JS, integração com n8n via webhook,
-                  persistência em Supabase Postgres e painel com métricas reais de operação.
+                  O AI Agent é um projeto de portfólio com interface de chat e backend orientado a integração.
+                  Ele utiliza um agente de IA geral via fluxo no n8n, sem fine-tuning ou treinamento proprietário deste projeto.
+                  A solução combina Node.js + Express, frontend leve em HTML/CSS/JS, persistência em Supabase Postgres
+                  e painel com métricas reais de execução.
                 </p>
               </article>
 
               <article class="about-block">
                 <h5>Arquitetura</h5>
                 <ul>
-                  <li>Backend em Node.js (Express) para orquestração de requisições e fallback operacional.</li>
-                  <li>Integração com n8n via webhook para processamento inteligente das consultas.</li>
-                  <li>Persistência de conversas e metadados em Postgres (Supabase).</li>
-                  <li>Deploy contínuo e isolamento de ambiente no Render.</li>
+                  <li>Backend em Node.js (Express) para roteamento de requisições e controle de fallback.</li>
+                  <li>Integração assíncrona com n8n via webhook para geração de resposta do agente.</li>
+                  <li>Persistência de mensagens e metadados em Supabase Postgres.</li>
+                  <li>Deploy em Render com variáveis de ambiente separadas por serviço.</li>
                 </ul>
               </article>
 
               <article class="about-block">
                 <h5>Diferenciais Técnicos</h5>
                 <ul>
-                  <li>Fallback interno para garantir resposta mesmo com indisponibilidade do n8n.</li>
-                  <li>Retry com backoff para respostas 429 e rate limit por IP para proteger a API.</li>
-                  <li>Arquitetura desacoplada por webhook, facilitando evolução e troca de provedor de IA.</li>
-                  <li>Persistência estruturada das interações para auditoria e melhoria orientada por uso real.</li>
-                  <li>Métricas reais no dashboard: execuções totais, erros críticos e tempo médio de resposta.</li>
+                  <li>Fallback interno para manter o chat funcional quando o fluxo externo falha.</li>
+                  <li>Retry com backoff para 429 e rate limit por IP para maior estabilidade operacional.</li>
+                  <li>Arquitetura desacoplada por webhook, facilitando troca de provedor de IA no futuro.</li>
+                  <li>Persistência estruturada das interações para análise de uso e rastreabilidade.</li>
+                  <li>Métricas reais no dashboard: total de execuções, erros e tempo médio de resposta.</li>
                 </ul>
               </article>
 
               <article class="about-block">
                 <h5>Roadmap</h5>
                 <ul>
-                  <li>Evoluir dashboard com histórico temporal e filtros por período.</li>
-                  <li>Integração com múltiplas fontes de logs e observabilidade.</li>
-                  <li>Evolução para execução assistida de tarefas técnicas automatizadas.</li>
+                  <li>Expandir dashboard com histórico temporal e filtros por período.</li>
+                  <li>Adicionar novas integrações de entrada (logs, tickets e eventos operacionais).</li>
+                  <li>Melhorar trilha de auditoria e qualidade de resposta com métricas comparativas.</li>
                 </ul>
               </article>
 
-              <p class="about-status">Status atual: versão v1.3.0 em operação estável, com foco em confiabilidade, observabilidade e experiência técnica.</p>
+              <p class="about-status">Status atual: versão v1.3.0 em operação estável como projeto de portfólio, com foco em confiabilidade, observabilidade e evolução incremental.</p>
 
             </section>
           </section>
