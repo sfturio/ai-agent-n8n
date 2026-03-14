@@ -290,6 +290,13 @@ body {
   padding-top: 14px;
 }
 
+.composer-note {
+  margin: 8px 2px 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(198, 198, 204, 0.78);
+}
+
 .composer {
   background: var(--surface-low);
   border-radius: 14px;
