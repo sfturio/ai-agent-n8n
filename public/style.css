@@ -269,6 +269,12 @@ body {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
+  transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+}
+
+.composer:focus-within {
+  background: rgba(23, 27, 38, 0.95);
+  box-shadow: 0 0 0 1px rgba(184, 195, 255, 0.35);
 }
 
 .composer input {

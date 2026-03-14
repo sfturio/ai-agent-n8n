@@ -6,6 +6,7 @@ const menuItems = document.querySelectorAll(".side-item[data-view-target]");
 const viewChat = document.getElementById("view-chat");
 const viewChangelog = document.getElementById("view-changelog");
 const viewAbout = document.getElementById("view-about");
+const defaultInputPlaceholder = input?.getAttribute("placeholder") || "";
 
 function showView(target) {
   const views = {
@@ -269,6 +270,16 @@ input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     sendMessage();
+  }
+});
+
+input.addEventListener("focus", () => {
+  input.setAttribute("placeholder", "");
+});
+
+input.addEventListener("blur", () => {
+  if (!input.value.trim()) {
+    input.setAttribute("placeholder", defaultInputPlaceholder);
   }
 });
 
