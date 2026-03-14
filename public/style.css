@@ -142,6 +142,8 @@ body {
 .topbar h2 {
   margin: 0;
   font-size: 20px;
+  color: #d3d9e8;
+  font-weight: 600;
 }
 
 .topbar-actions {
@@ -274,7 +276,7 @@ body {
 
 .composer:focus-within {
   background: rgba(23, 27, 38, 0.95);
-  box-shadow: 0 0 0 1px rgba(184, 195, 255, 0.35);
+  box-shadow: 0 0 0 1px rgba(184, 195, 255, 0.18);
 }
 
 .composer input {
