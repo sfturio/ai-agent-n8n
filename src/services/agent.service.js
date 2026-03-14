@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
+const MAX_RETRIES = Number(process.env.N8N_RETRY_MAX || 2);
+const RETRY_BASE_DELAY_MS = Number(process.env.N8N_RETRY_BASE_DELAY_MS || 800);
 
 function safeJson(value, maxLen = 2000) {
   try {
@@ -53,6 +55,40 @@ function extractReplyText(payload) {
   return "";
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parseRetryAfterMs(value) {
+  if (!value) return null;
+  const asNumber = Number(value);
+  if (Number.isFinite(asNumber) && asNumber > 0) return Math.round(asNumber * 1000);
+
+  const asDate = Date.parse(String(value));
+  if (Number.isFinite(asDate)) {
+    const delta = asDate - Date.now();
+    return delta > 0 ? delta : null;
+  }
+
+  return null;
+}
+
+function backoffMs(attempt) {
+  return RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+}
+
+async function postToN8N(message) {
+  return axios.post(
+    WEBHOOK_URL,
+    { message: message.trim() },
+    {
+      headers: { "Content-Type": "application/json" },
+      timeout: 15000,
+      validateStatus: () => true,
+    },
+  );
+}
+
 export async function processMessage(message) {
   if (!WEBHOOK_URL) {
     throw new Error("N8N_WEBHOOK_URL is not defined");
@@ -63,15 +99,26 @@ export async function processMessage(message) {
   }
 
   try {
-    const response = await axios.post(
-      WEBHOOK_URL,
-      { message: message.trim() },
-      {
-        headers: { "Content-Type": "application/json" },
-        timeout: 15000,
-        validateStatus: () => true,
-      },
-    );
+    let response = null;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      response = await postToN8N(message);
+
+      if (response.status !== 429) break;
+
+      if (attempt === MAX_RETRIES) break;
+
+      const retryAfterHeader = response.headers?.["retry-after"];
+      const retryAfterMs = parseRetryAfterMs(retryAfterHeader);
+      const delay = retryAfterMs ?? backoffMs(attempt);
+
+      console.warn("n8n returned 429, retrying...", {
+        attempt: attempt + 1,
+        delayMs: delay,
+      });
+
+      await sleep(delay);
+    }
 
     if (response.status >= 200 && response.status < 300) {
       const replyText = extractReplyText(response.data);
