@@ -106,6 +106,12 @@ body {
   color: var(--text-muted);
 }
 
+.build-info .app-version {
+  font-size: 11px;
+  opacity: 0.88;
+  letter-spacing: 0.03em;
+}
+
 .sidebar-contact {
   margin-top: 12px;
   padding-top: 10px;
