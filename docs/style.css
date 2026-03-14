@@ -122,6 +122,19 @@ body:not(.theme-dark) .btn:hover {
   text-decoration: underline;
 }
 
+.demo-media {
+  margin: 10px 0 0;
+}
+
+.demo-gif {
+  width: 100%;
+  max-width: 860px;
+  border-radius: 12px;
+  border: 1px solid rgba(127, 140, 170, 0.28);
+  display: block;
+  background: var(--surface);
+}
+
 section {
   margin-bottom: 10px;
   padding: 14px 14px 12px;
