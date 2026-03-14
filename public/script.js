@@ -223,6 +223,14 @@ async function refreshMetrics() {
   }
 }
 
+async function warmupProvider() {
+  try {
+    await fetch("/api/agent/warmup", { method: "GET" });
+  } catch {
+    // Warmup is best-effort only.
+  }
+}
+
 async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
@@ -326,5 +334,6 @@ menuItems.forEach((item) => {
 
 setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e comportamento da aplicacao."), 400);
 setTimeout(() => addBotMessageMarkdown("Se quiser, posso detalhar os pontos do changelog ou da arquitetura do projeto."), 950);
+warmupProvider();
 refreshMetrics();
 setInterval(refreshMetrics, 15000);

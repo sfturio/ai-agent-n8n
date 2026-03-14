@@ -1,4 +1,4 @@
-import { processMessage } from "../services/agent.service.js";
+import { processMessage, warmupN8NService } from "../services/agent.service.js";
 import { getInteractionMetrics, saveInteractionLog } from "../services/supabase-log.service.js";
 
 const runtimeMetrics = {
@@ -115,5 +115,13 @@ export async function getAgentMetrics(req, res) {
     avgResponseTimeMs,
     durationSampleSize: runtimeMetrics.samples,
     source: "runtime",
+  });
+}
+
+export async function warmupAgentProvider(req, res) {
+  const result = await warmupN8NService({ force: false });
+  return res.status(202).json({
+    ok: true,
+    ...result,
   });
 }

@@ -6,6 +6,12 @@ dotenv.config();
 const WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 const MAX_RETRIES = Number(process.env.N8N_RETRY_MAX || 2);
 const RETRY_BASE_DELAY_MS = Number(process.env.N8N_RETRY_BASE_DELAY_MS || 800);
+const REQUEST_TIMEOUT_MS = Number(process.env.N8N_REQUEST_TIMEOUT_MS || 45000);
+const WARMUP_URL = process.env.N8N_WARMUP_URL;
+const WARMUP_TIMEOUT_MS = Number(process.env.N8N_WARMUP_TIMEOUT_MS || 8000);
+const COLD_START_RETRY_DELAY_MS = Number(process.env.N8N_COLD_START_RETRY_DELAY_MS || 3500);
+
+let lastWarmupAt = 0;
 
 function safeJson(value, maxLen = 2000) {
   try {
@@ -83,13 +89,68 @@ async function postToN8N(message) {
     { message: message.trim() },
     {
       headers: { "Content-Type": "application/json" },
-      timeout: 15000,
+      timeout: REQUEST_TIMEOUT_MS,
       validateStatus: () => true,
     },
   );
 }
 
-export async function processMessage(message) {
+function resolveWarmupUrl() {
+  if (typeof WARMUP_URL === "string" && WARMUP_URL.trim().length > 0) {
+    return WARMUP_URL.trim();
+  }
+
+  if (typeof WEBHOOK_URL !== "string" || WEBHOOK_URL.trim().length === 0) {
+    return "";
+  }
+
+  try {
+    return new URL(WEBHOOK_URL).origin;
+  } catch {
+    return "";
+  }
+}
+
+function shouldRetryForColdStart(error) {
+  const code = String(error?.code ?? "").toUpperCase();
+  return code === "ECONNABORTED" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "ETIMEDOUT";
+}
+
+export async function warmupN8NService({ force = false } = {}) {
+  const warmupTarget = resolveWarmupUrl();
+  if (!warmupTarget) {
+    return { ok: false, skipped: true, reason: "missing_warmup_url" };
+  }
+
+  const now = Date.now();
+  if (!force && now - lastWarmupAt < 15_000) {
+    return { ok: true, skipped: true, reason: "throttled" };
+  }
+  lastWarmupAt = now;
+
+  try {
+    const res = await axios.get(warmupTarget, {
+      timeout: WARMUP_TIMEOUT_MS,
+      validateStatus: () => true,
+    });
+
+    return {
+      ok: true,
+      skipped: false,
+      status: res.status,
+      target: warmupTarget,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      skipped: false,
+      target: warmupTarget,
+      error: error?.message || "warmup request failed",
+    };
+  }
+}
+
+export async function processMessage(message, { allowColdStartRetry = true } = {}) {
   if (!WEBHOOK_URL) {
     throw new Error("N8N_WEBHOOK_URL is not defined");
   }
@@ -151,6 +212,13 @@ export async function processMessage(message) {
         timeout: error.code === "ECONNABORTED",
         url: WEBHOOK_URL,
       });
+
+      if (allowColdStartRetry && shouldRetryForColdStart(error)) {
+        const warm = await warmupN8NService({ force: true });
+        console.warn("n8n warmup before retry:", warm);
+        await sleep(COLD_START_RETRY_DELAY_MS);
+        return processMessage(message, { allowColdStartRetry: false });
+      }
 
       if (error.code === "ECONNABORTED") {
         throw new Error("n8n webhook timeout");
