@@ -12,7 +12,7 @@
       <header class="top">
         <div>
           <h1>AI Agent</h1>
-          <p class="subtitle">Documentação técnica do assistente Node.js + n8n</p>
+          <p class="subtitle">Documentação técnica do projeto de portfólio com Node.js, n8n e Supabase.</p>
         </div>
 
         <div class="actions">
@@ -37,8 +37,9 @@
       <section>
         <h2>Visão Geral</h2>
         <p>
-          O AI Agent é um assistente técnico focado em análise de logs, dúvidas sobre código e contexto operacional.
-          O backend é modular e integra com n8n via webhook. Quando configurado, o histórico de interações é persistido no Supabase.
+          O AI Agent é um projeto de portfólio com agente de IA geral e interface de chat.
+          A aplicação envia prompts para um fluxo n8n via webhook e devolve a resposta em uma UX simples e direta.
+          Interações e metadados podem ser persistidos no Supabase para observabilidade.
         </p>
       </section>
 
@@ -46,8 +47,9 @@
         <h2>Arquitetura</h2>
         <div class="code-wrap">
           <button class="copy-btn" type="button">Copiar</button>
-          <pre class="code-block">UI (public/) -> POST /api/agent -> controller -> service -> webhook n8n
-                          \-> saveInteractionLog -> Supabase</pre>
+          <pre class="code-block">UI (public/) -> POST /api/agent -> middleware rate-limit -> controller -> service -> webhook n8n
+                          \-> saveInteractionLog -> Supabase
+UI (public/) -> GET /api/agent/metrics -> controller -> agregação Supabase (fallback: runtime)</pre>
         </div>
       </section>
 
@@ -73,6 +75,20 @@
           <button class="copy-btn" type="button">Copiar</button>
           <pre class="code-block">{ "ok": true }</pre>
         </div>
+
+        <h3>GET <code>/api/agent/metrics</code></h3>
+        <p>Retorna métricas do dashboard via Supabase (ou fallback em memória quando indisponível).</p>
+        <div class="code-wrap">
+          <button class="copy-btn" type="button">Copiar</button>
+          <pre class="code-block">{
+  "ok": true,
+  "totalExecutions": 12842,
+  "criticalErrors": 12,
+  "avgResponseTimeMs": 248,
+  "durationSampleSize": 500,
+  "source": "supabase"
+}</pre>
+        </div>
       </section>
 
       <section>
@@ -83,7 +99,19 @@
 N8N_WEBHOOK_URL=https://your-n8n-instance/webhook/agent
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
-SUPABASE_TABLE=agent_messages</pre>
+SUPABASE_TABLE=agent_messages
+
+# Política de retry para 429 do n8n
+N8N_RETRY_MAX=2
+N8N_RETRY_BASE_DELAY_MS=800
+
+# Rate limit da API (por IP)
+RATE_LIMIT_WINDOW_MS=60000
+RATE_LIMIT_MAX_REQUESTS=20
+RATE_LIMIT_BLOCK_MS=30000
+
+# Janela de amostragem de métricas
+METRICS_SAMPLE_LIMIT=500</pre>
         </div>
       </section>
 
@@ -115,8 +143,11 @@ SUPABASE_TABLE=agent_messages</pre>
       <section>
         <h2>Resolução de Problemas</h2>
         <ul>
-          <li><strong>500 no /api/agent:</strong> validar <code>N8N_WEBHOOK_URL</code> e status do webhook no n8n.</li>
+          <li><strong>429 no /api/agent:</strong> houve rajada de requisições por IP; aguardar o <code>Retry-After</code>.</li>
+          <li><strong>429 no n8n:</strong> ajustar <code>N8N_RETRY_MAX</code> e <code>N8N_RETRY_BASE_DELAY_MS</code>.</li>
+          <li><strong>500 no /api/agent:</strong> validar <code>N8N_WEBHOOK_URL</code> e execução do webhook no n8n.</li>
           <li><strong>Sem histórico salvo:</strong> validar credenciais Supabase (<code>SUPABASE_URL</code> e service key).</li>
+          <li><strong>Métricas indisponíveis:</strong> validar acesso ao Supabase; o endpoint faz fallback para métricas em runtime.</li>
           <li><strong>Erro de boot no Render:</strong> confirmar <code>npm start</code> e Node >= 18.</li>
         </ul>
       </section>
@@ -124,9 +155,10 @@ SUPABASE_TABLE=agent_messages</pre>
       <section>
         <h2>Mudanças Recentes</h2>
         <ul>
-          <li><code>v1.1.2</code>: fallback amigável quando o n8n está indisponível.</li>
-          <li><code>v1.1.0</code>: migração de persistência para Supabase.</li>
-          <li><code>v1.0.8</code>: parsing robusto da resposta do webhook.</li>
+          <li><code>v1.3.0</code>: dashboard integrado a métricas reais via <code>/api/agent/metrics</code>.</li>
+          <li><code>v1.2.1</code>: retry com backoff para <code>429</code> do n8n + rate limit por IP na API.</li>
+          <li><code>v1.2.0</code>: documentação e interface reorganizadas em Chat, Changelog e About Project.</li>
+          <li><code>v1.1.0</code>: persistência de interações migrada para Supabase Postgres.</li>
         </ul>
       </section>
 
