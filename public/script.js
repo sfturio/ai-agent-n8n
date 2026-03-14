@@ -2,6 +2,14 @@ const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const button = document.getElementById("send");
 const form = document.getElementById("form");
+const metricExecutions = document.getElementById("metricExecutions");
+const metricSuccessRate = document.getElementById("metricSuccessRate");
+const metricResponseTime = document.getElementById("metricResponseTime");
+const metricTokenUsage = document.getElementById("metricTokenUsage");
+const successBadge = document.getElementById("successBadge");
+const execDelta = document.getElementById("execDelta");
+const speedBadge = document.getElementById("speedBadge");
+const executionRows = document.getElementById("executionRows");
 
 function addMessage(text, sender) {
   const div = document.createElement("div");
@@ -166,6 +174,76 @@ function extractReply(data, raw) {
   );
 }
 
+function chipClassByStatus(status) {
+  if (status === "RUNNING") return "chip chip-running";
+  if (status === "ERROR") return "chip chip-error";
+  return "chip";
+}
+
+function dotClassByStatus(status) {
+  if (status === "RUNNING") return "dot dot-info";
+  if (status === "ERROR") return "dot dot-error";
+  return "dot";
+}
+
+function renderExecutions(rows) {
+  if (!executionRows) return;
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    executionRows.innerHTML = `
+      <tr>
+        <td colspan="4">Sem execucoes ainda. Envie uma mensagem para iniciar.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  executionRows.innerHTML = rows
+    .map((row) => {
+      const agent = row?.agent || "Neural_Alpha";
+      const status = row?.status || "SUCCESS";
+      const duration = row?.durationLabel || "0.0s";
+      const id = row?.id ? `#${row.id}` : "-";
+
+      return `
+        <tr>
+          <td><span class="${dotClassByStatus(status)}"></span>${agent}</td>
+          <td><span class="${chipClassByStatus(status)}">${status}</span></td>
+          <td>${duration}</td>
+          <td>${id}</td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function updateMetricText(el, value) {
+  if (!el) return;
+  el.textContent = value;
+}
+
+async function refreshDashboard() {
+  try {
+    const res = await fetch("/api/agent/dashboard", { method: "GET" });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const metrics = data?.metrics ?? {};
+
+    updateMetricText(metricExecutions, String(metrics.executions ?? 0));
+    updateMetricText(metricSuccessRate, `${Number(metrics.successRate ?? 0).toFixed(1)}%`);
+    updateMetricText(metricResponseTime, `${Math.max(0, Number(metrics.avgResponseTimeMs ?? 0))}ms`);
+    updateMetricText(metricTokenUsage, String(metrics.tokenUsage ?? "0"));
+    updateMetricText(successBadge, Number(metrics.successRate ?? 0) >= 95 ? "Optimal" : "Stable");
+    updateMetricText(execDelta, `Running ${Number(metrics.runningCount ?? 0)}`);
+    updateMetricText(speedBadge, Number(metrics.avgResponseTimeMs ?? 0) > 0 ? "Measured" : "Live");
+
+    renderExecutions(data?.executions ?? []);
+  } catch {
+    // Keep current UI state if dashboard fetch fails.
+  }
+}
+
 async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
@@ -229,6 +307,7 @@ async function sendMessage() {
   } finally {
     button.disabled = false;
     input.disabled = false;
+    refreshDashboard();
   }
 }
 
@@ -251,3 +330,5 @@ input.addEventListener("keydown", (e) => {
 
 setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e execucoes dos agentes."), 350);
 setTimeout(() => addBotMessageMarkdown("Envie um ID de execucao para diagnostico rapido."), 900);
+refreshDashboard();
+setInterval(refreshDashboard, 10000);

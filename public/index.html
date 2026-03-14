@@ -77,28 +77,28 @@
           <article class="stat-card">
             <div class="stat-head">
               <span class="stat-icon material-symbols-outlined">data_exploration</span>
-              <span class="chip chip-positive">+12%</span>
+              <span class="chip chip-positive" id="execDelta">Real-time</span>
             </div>
             <p class="stat-label">Executions</p>
-            <p class="stat-value">1,248</p>
+            <p class="stat-value" id="metricExecutions">0</p>
           </article>
 
           <article class="stat-card">
             <div class="stat-head">
               <span class="stat-icon material-symbols-outlined">verified</span>
-              <span class="chip chip-positive">Optimal</span>
+              <span class="chip chip-positive" id="successBadge">Stable</span>
             </div>
             <p class="stat-label">Success Rate</p>
-            <p class="stat-value">99.2%</p>
+            <p class="stat-value" id="metricSuccessRate">0.0%</p>
           </article>
 
           <article class="stat-card">
             <div class="stat-head">
               <span class="stat-icon material-symbols-outlined">speed</span>
-              <span class="chip chip-warning">-50ms</span>
+              <span class="chip chip-warning" id="speedBadge">Live</span>
             </div>
             <p class="stat-label">Response Time</p>
-            <p class="stat-value">450ms</p>
+            <p class="stat-value" id="metricResponseTime">0ms</p>
           </article>
 
           <article class="stat-card">
@@ -107,7 +107,7 @@
               <span class="chip">Monthly</span>
             </div>
             <p class="stat-label">Token Usage</p>
-            <p class="stat-value">4.2M</p>
+            <p class="stat-value" id="metricTokenUsage">0</p>
           </article>
         </section>
 
@@ -128,32 +128,7 @@
                     <th>ID</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td><span class="dot dot-info"></span>CustomerSupport_v2</td>
-                    <td><span class="chip chip-running">RUNNING</span></td>
-                    <td>12.4s</td>
-                    <td>#ax-9021</td>
-                  </tr>
-                  <tr>
-                    <td><span class="dot"></span>DataAnalyzer_Bot</td>
-                    <td><span class="chip">SUCCESS</span></td>
-                    <td>45.8s</td>
-                    <td>#ax-8842</td>
-                  </tr>
-                  <tr>
-                    <td><span class="dot dot-error"></span>LeadGen_Script</td>
-                    <td><span class="chip chip-error">ERROR</span></td>
-                    <td>1.2s</td>
-                    <td>#ax-8711</td>
-                  </tr>
-                  <tr>
-                    <td><span class="dot"></span>MarketResearch_v1</td>
-                    <td><span class="chip">SUCCESS</span></td>
-                    <td>122.1s</td>
-                    <td>#ax-8690</td>
-                  </tr>
-                </tbody>
+                <tbody id="executionRows"></tbody>
               </table>
             </div>
           </section>
