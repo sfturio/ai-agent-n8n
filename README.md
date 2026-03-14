@@ -124,6 +124,7 @@ docs/
 
 ## Changelog resumido
 
-- `v1.1.2`: fallback amigável em indisponibilidade do n8n.
+- `v1.3.0`: endpoint de métricas reais (`/api/agent/metrics`) integrado ao dashboard.
+- `v1.2.1`: retry com backoff para `429` do n8n + rate limit por IP no endpoint do agente.
+- `v1.2.0`: documentação técnica reformulada e interface reorganizada por contexto.
 - `v1.1.0`: persistência migrada para Supabase Postgres.
-- `v1.0.8`: parsing robusto da resposta do webhook n8n.

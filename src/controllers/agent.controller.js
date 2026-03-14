@@ -1,5 +1,12 @@
 import { processMessage } from "../services/agent.service.js";
-import { saveInteractionLog } from "../services/supabase-log.service.js";
+import { getInteractionMetrics, saveInteractionLog } from "../services/supabase-log.service.js";
+
+const runtimeMetrics = {
+  totalExecutions: 0,
+  criticalErrors: 0,
+  totalResponseTimeMs: 0,
+  samples: 0,
+};
 
 function isUpstreamUnavailable(error) {
   const msg = String(error?.message ?? "").toLowerCase();
@@ -15,7 +22,18 @@ function fallbackReply() {
   return "Estou com instabilidade no provedor agora. Tente novamente em alguns segundos.";
 }
 
+function trackRuntimeExecution({ ok, durationMs }) {
+  runtimeMetrics.totalExecutions += 1;
+  if (!ok) runtimeMetrics.criticalErrors += 1;
+
+  if (Number.isFinite(durationMs) && durationMs >= 0) {
+    runtimeMetrics.totalResponseTimeMs += durationMs;
+    runtimeMetrics.samples += 1;
+  }
+}
+
 export async function handleAgent(req, res) {
+  const startedAt = Date.now();
   try {
     const { message } = req.body ?? {};
 
@@ -29,10 +47,12 @@ export async function handleAgent(req, res) {
 
     const normalizedMessage = message.trim();
     const reply = await processMessage(normalizedMessage);
+    const durationMs = Date.now() - startedAt;
+    trackRuntimeExecution({ ok: true, durationMs });
 
     await saveInteractionLog({
       message: normalizedMessage,
-      responseBody: { reply },
+      responseBody: { reply, duration_ms: durationMs },
       ok: true,
       errorMessage: null,
     });
@@ -43,11 +63,13 @@ export async function handleAgent(req, res) {
     const incomingMessage = typeof req.body?.message === "string" ? req.body.message.trim() : null;
     const upstreamUnavailable = isUpstreamUnavailable(error);
     const fallback = fallbackReply();
+    const durationMs = Date.now() - startedAt;
+    trackRuntimeExecution({ ok: false, durationMs });
 
     await saveInteractionLog({
       message: incomingMessage,
-      responseBody: upstreamUnavailable ? { reply: fallback, degraded: true } : null,
-      ok: upstreamUnavailable,
+      responseBody: upstreamUnavailable ? { reply: fallback, degraded: true, duration_ms: durationMs } : { duration_ms: durationMs },
+      ok: false,
       errorMessage: upstreamUnavailable ? `${error?.message ?? "unknown error"} | fallback_response` : error?.message ?? "unknown error",
     });
 
@@ -69,4 +91,29 @@ export async function handleAgent(req, res) {
       error: "internal server error",
     });
   }
+}
+
+export async function getAgentMetrics(req, res) {
+  const persistedMetrics = await getInteractionMetrics();
+
+  if (persistedMetrics) {
+    return res.status(200).json({
+      ok: true,
+      ...persistedMetrics,
+    });
+  }
+
+  const avgResponseTimeMs =
+    runtimeMetrics.samples > 0
+      ? Math.round(runtimeMetrics.totalResponseTimeMs / runtimeMetrics.samples)
+      : 0;
+
+  return res.status(200).json({
+    ok: true,
+    totalExecutions: runtimeMetrics.totalExecutions,
+    criticalErrors: runtimeMetrics.criticalErrors,
+    avgResponseTimeMs,
+    durationSampleSize: runtimeMetrics.samples,
+    source: "runtime",
+  });
 }

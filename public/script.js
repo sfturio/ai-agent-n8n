@@ -7,6 +7,9 @@ const viewChat = document.getElementById("view-chat");
 const viewChangelog = document.getElementById("view-changelog");
 const viewAbout = document.getElementById("view-about");
 const defaultInputPlaceholder = input?.getAttribute("placeholder") || "";
+const metricTotalExecutions = document.getElementById("metric-total-executions");
+const metricCriticalErrors = document.getElementById("metric-critical-errors");
+const metricAvgResponseTime = document.getElementById("metric-avg-response-time");
 
 function showView(target) {
   const views = {
@@ -190,6 +193,36 @@ function extractReply(data, raw) {
   );
 }
 
+function formatInt(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "--";
+  return new Intl.NumberFormat("pt-BR").format(Math.round(num));
+}
+
+function formatMs(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return "--";
+  return `${Math.max(0, Math.round(num))}ms`;
+}
+
+function setMetrics({ totalExecutions, criticalErrors, avgResponseTimeMs }) {
+  if (metricTotalExecutions) metricTotalExecutions.textContent = formatInt(totalExecutions);
+  if (metricCriticalErrors) metricCriticalErrors.textContent = formatInt(criticalErrors);
+  if (metricAvgResponseTime) metricAvgResponseTime.textContent = formatMs(avgResponseTimeMs);
+}
+
+async function refreshMetrics() {
+  try {
+    const res = await fetch("/api/agent/metrics", { method: "GET" });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    setMetrics(data ?? {});
+  } catch {
+    // Keep previous metrics if request fails.
+  }
+}
+
 async function sendMessage() {
   const text = input.value.trim();
   if (!text) return;
@@ -253,6 +286,7 @@ async function sendMessage() {
   } finally {
     button.disabled = false;
     input.disabled = false;
+    refreshMetrics();
   }
 }
 
@@ -292,3 +326,5 @@ menuItems.forEach((item) => {
 
 setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e comportamento da aplicacao."), 400);
 setTimeout(() => addBotMessageMarkdown("Se quiser, posso detalhar os pontos do changelog ou da arquitetura do projeto."), 950);
+refreshMetrics();
+setInterval(refreshMetrics, 15000);

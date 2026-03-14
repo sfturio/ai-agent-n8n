@@ -51,7 +51,10 @@
 
       <main class="workspace">
         <header class="topbar">
-          <h2>Developer Console</h2>
+          <div class="topbar-title">
+            <span class="topbar-label">Developer</span>
+            <h2>Agent Console</h2>
+          </div>
           <div class="topbar-actions">
             <span class="status-pill"><span class="status-dot"></span>NODE_01 CONNECTED</span>
           </div>
@@ -79,19 +82,19 @@
               <div class="content-list">
                 <article class="log-item">
                   <span class="time">2026-03-14</span>
-                  <p><b>v1.1.2 · reliability</b> Agente passou a responder com fallback amigável quando o n8n fica indisponível, reduzindo erros 500 para o usuário final.</p>
+                  <p><b>v1.3.0 · observability</b> Métricas reais adicionadas ao dashboard via <code>/api/agent/metrics</code> (execuções totais, erros críticos e tempo médio de resposta).</p>
+                </article>
+                <article class="log-item">
+                  <span class="time">2026-03-14</span>
+                  <p><b>v1.2.1 · reliability</b> Retry com backoff para respostas 429 do n8n e rate limit por IP no endpoint do agente.</p>
+                </article>
+                <article class="log-item">
+                  <span class="time">2026-03-11</span>
+                  <p><b>v1.2.0 · docs/ui</b> Documentação técnica reformulada (EN/PT-BR) e navegação da interface reorganizada em Chat, Changelog e About Project.</p>
                 </article>
                 <article class="log-item">
                   <span class="time">2026-03-11</span>
                   <p><b>v1.1.0 · infra</b> Persistência migrada para Supabase Postgres, mantendo histórico de interações mesmo após reinícios de infraestrutura.</p>
-                </article>
-                <article class="log-item">
-                  <span class="time">2026-03-10</span>
-                  <p><b>v1.0.8 · backend</b> Endpoint principal consolidado com resposta textual e parsing mais robusto das respostas do n8n.</p>
-                </article>
-                <article class="log-item">
-                  <span class="time">2026-03-09</span>
-                  <p><b>v1.0.7 · ux</b> Renderização markdown melhorada no chat com suporte estável para listas ordenadas e bullets.</p>
                 </article>
               </div>
             </section>
@@ -108,8 +111,8 @@
                 <h5>Visão Geral</h5>
                 <p>
                   O AI Agent é um assistente web para interpretar logs, trechos de código e métricas operacionais com velocidade.
-                  A arquitetura usa Node.js + Express no backend, frontend leve em HTML/CSS/JS, integração com n8n via webhook e
-                  persistência em Supabase Postgres para rastreabilidade contínua.
+                  A arquitetura usa Node.js + Express no backend, frontend leve em HTML/CSS/JS, integração com n8n via webhook,
+                  persistência em Supabase Postgres e painel com métricas reais de operação.
                 </p>
               </article>
 
@@ -127,22 +130,23 @@
                 <h5>Diferenciais Técnicos</h5>
                 <ul>
                   <li>Fallback interno para garantir resposta mesmo com indisponibilidade do n8n.</li>
+                  <li>Retry com backoff para respostas 429 e rate limit por IP para proteger a API.</li>
                   <li>Arquitetura desacoplada por webhook, facilitando evolução e troca de provedor de IA.</li>
                   <li>Persistência estruturada das interações para auditoria e melhoria orientada por uso real.</li>
-                  <li>Frontend leve e responsivo com foco em performance e clareza operacional.</li>
+                  <li>Métricas reais no dashboard: execuções totais, erros críticos e tempo médio de resposta.</li>
                 </ul>
               </article>
 
               <article class="about-block">
                 <h5>Roadmap</h5>
                 <ul>
-                  <li>Painel analítico com métricas de uso e qualidade das respostas.</li>
+                  <li>Evoluir dashboard com histórico temporal e filtros por período.</li>
                   <li>Integração com múltiplas fontes de logs e observabilidade.</li>
                   <li>Evolução para execução assistida de tarefas técnicas automatizadas.</li>
                 </ul>
               </article>
 
-              <p class="about-status">Status atual: versão v1.1.2 em operação estável com melhorias contínuas de confiabilidade e experiência técnica.</p>
+              <p class="about-status">Status atual: versão v1.3.0 em operação estável, com foco em confiabilidade, observabilidade e experiência técnica.</p>
 
             </section>
           </section>
@@ -153,21 +157,21 @@
               <article class="metric-card">
                 <div>
                   <p>Total Executions</p>
-                  <strong>12,842</strong>
+                  <strong id="metric-total-executions">--</strong>
                 </div>
                 <span class="material-symbols-outlined">terminal</span>
               </article>
               <article class="metric-card">
                 <div>
                   <p>Critical Errors</p>
-                  <strong class="danger">12</strong>
+                  <strong id="metric-critical-errors" class="danger">--</strong>
                 </div>
                 <span class="material-symbols-outlined danger">warning</span>
               </article>
               <article class="metric-card">
                 <div>
                   <p>Avg Response Time</p>
-                  <strong class="accent">248ms</strong>
+                  <strong id="metric-avg-response-time" class="accent">--</strong>
                 </div>
                 <span class="material-symbols-outlined accent">speed</span>
               </article>

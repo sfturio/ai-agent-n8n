@@ -141,8 +141,23 @@ body {
 
 .topbar h2 {
   margin: 0;
-  font-size: 20px;
-  color: #d3d9e8;
+  font-size: 22px;
+  color: #dbe1ee;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+}
+
+.topbar-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topbar-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(198, 198, 204, 0.72);
   font-weight: 600;
 }
 
