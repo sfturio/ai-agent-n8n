@@ -10,8 +10,13 @@ const REQUEST_TIMEOUT_MS = Number(process.env.N8N_REQUEST_TIMEOUT_MS || 45000);
 const WARMUP_URL = process.env.N8N_WARMUP_URL;
 const WARMUP_TIMEOUT_MS = Number(process.env.N8N_WARMUP_TIMEOUT_MS || 8000);
 const COLD_START_RETRY_DELAY_MS = Number(process.env.N8N_COLD_START_RETRY_DELAY_MS || 3500);
+const WARMUP_METHOD = String(process.env.N8N_WARMUP_METHOD || "GET").toUpperCase();
+const READY_TTL_MS = Number(process.env.N8N_READY_TTL_MS || 120000);
+const WARMUP_MAX_WAIT_MS = Number(process.env.N8N_WARMUP_MAX_WAIT_MS || 30000);
+const WARMUP_POLL_INTERVAL_MS = Number(process.env.N8N_WARMUP_POLL_INTERVAL_MS || 3000);
 
 let lastWarmupAt = 0;
+let lastWarmupSuccessAt = 0;
 
 function safeJson(value, maxLen = 2000) {
   try {
@@ -129,25 +134,78 @@ export async function warmupN8NService({ force = false } = {}) {
   lastWarmupAt = now;
 
   try {
-    const res = await axios.get(warmupTarget, {
+    const requestConfig = {
       timeout: WARMUP_TIMEOUT_MS,
       validateStatus: () => true,
-    });
+    };
+
+    const res =
+      WARMUP_METHOD === "POST"
+        ? await axios.post(warmupTarget, { warmup: true }, { ...requestConfig, headers: { "Content-Type": "application/json" } })
+        : await axios.get(warmupTarget, requestConfig);
+
+    const isOk = res.status >= 200 && res.status < 300;
+    if (isOk) {
+      lastWarmupSuccessAt = Date.now();
+    }
 
     return {
-      ok: true,
+      ok: isOk,
       skipped: false,
       status: res.status,
       target: warmupTarget,
+      method: WARMUP_METHOD,
     };
   } catch (error) {
     return {
       ok: false,
       skipped: false,
       target: warmupTarget,
+      method: WARMUP_METHOD,
       error: error?.message || "warmup request failed",
     };
   }
+}
+
+export function getN8NReadiness() {
+  const now = Date.now();
+  const ageMs = lastWarmupSuccessAt > 0 ? now - lastWarmupSuccessAt : null;
+  return {
+    ready: Number.isFinite(ageMs) && ageMs >= 0 && ageMs <= READY_TTL_MS,
+    lastSuccessAt: lastWarmupSuccessAt || null,
+    ageMs,
+    ttlMs: READY_TTL_MS,
+  };
+}
+
+export async function ensureN8NReady() {
+  const snapshot = getN8NReadiness();
+  if (snapshot.ready) {
+    return { ok: true, source: "cache", readiness: snapshot };
+  }
+
+  const startedAt = Date.now();
+  let attempts = 0;
+  let lastResult = null;
+
+  while (Date.now() - startedAt < WARMUP_MAX_WAIT_MS) {
+    attempts += 1;
+    lastResult = await warmupN8NService({ force: true });
+
+    if (lastResult?.ok) {
+      return { ok: true, source: "warmup", attempts, readiness: getN8NReadiness(), warmup: lastResult };
+    }
+
+    await sleep(WARMUP_POLL_INTERVAL_MS);
+  }
+
+  return {
+    ok: false,
+    source: "warmup-timeout",
+    attempts,
+    readiness: getN8NReadiness(),
+    warmup: lastResult,
+  };
 }
 
 export async function processMessage(message, { allowColdStartRetry = true } = {}) {

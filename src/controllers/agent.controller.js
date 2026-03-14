@@ -1,4 +1,4 @@
-import { processMessage, warmupN8NService } from "../services/agent.service.js";
+import { ensureN8NReady, getN8NReadiness, processMessage, warmupN8NService } from "../services/agent.service.js";
 import { getInteractionMetrics, saveInteractionLog } from "../services/supabase-log.service.js";
 
 const runtimeMetrics = {
@@ -122,6 +122,26 @@ export async function warmupAgentProvider(req, res) {
   const result = await warmupN8NService({ force: false });
   return res.status(202).json({
     ok: true,
+    ...result,
+  });
+}
+
+export async function getAgentProviderReadiness(req, res) {
+  const readyOnly = String(req.query?.check || "").toLowerCase() === "true";
+
+  if (readyOnly) {
+    const readiness = getN8NReadiness();
+    return res.status(200).json({
+      ok: true,
+      ...readiness,
+      source: "cache",
+    });
+  }
+
+  const result = await ensureN8NReady();
+  const status = result.ok ? 200 : 503;
+  return res.status(status).json({
+    ok: result.ok,
     ...result,
   });
 }

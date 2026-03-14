@@ -10,6 +10,13 @@ const defaultInputPlaceholder = input?.getAttribute("placeholder") || "";
 const metricTotalExecutions = document.getElementById("metric-total-executions");
 const metricCriticalErrors = document.getElementById("metric-critical-errors");
 const metricAvgResponseTime = document.getElementById("metric-avg-response-time");
+let providerReady = false;
+let readinessInFlight = null;
+
+function setComposerEnabled(enabled) {
+  if (button) button.disabled = !enabled;
+  if (input) input.disabled = !enabled;
+}
 
 function showView(target) {
   const views = {
@@ -231,7 +238,36 @@ async function warmupProvider() {
   }
 }
 
+async function ensureProviderReady() {
+  if (providerReady) return true;
+  if (readinessInFlight) return readinessInFlight;
+
+  readinessInFlight = (async () => {
+    try {
+      const res = await fetch("/api/agent/ready", { method: "GET" });
+      const data = await res.json().catch(() => ({}));
+      providerReady = Boolean(data?.ok || data?.ready);
+      return providerReady;
+    } catch {
+      providerReady = false;
+      return false;
+    } finally {
+      readinessInFlight = null;
+    }
+  })();
+
+  return readinessInFlight;
+}
+
 async function sendMessage() {
+  const ready = await ensureProviderReady();
+  if (!ready) {
+    typeMessage("Fluxo de automacao ainda inicializando. Tente novamente em alguns segundos.", "bot", 12, {
+      finalizeMarkdown: false,
+    });
+    return;
+  }
+
   const text = input.value.trim();
   if (!text) return;
 
@@ -334,6 +370,19 @@ menuItems.forEach((item) => {
 
 setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e comportamento da aplicacao."), 400);
 setTimeout(() => addBotMessageMarkdown("Se quiser, posso detalhar os pontos do changelog ou da arquitetura do projeto."), 950);
+setComposerEnabled(false);
+input?.setAttribute("placeholder", "Inicializando workflow...");
 warmupProvider();
+ensureProviderReady().finally(() => {
+  if (providerReady) {
+    setComposerEnabled(true);
+    input?.setAttribute("placeholder", defaultInputPlaceholder);
+    return;
+  }
+
+  // Allow manual retry even if readiness check fails.
+  setComposerEnabled(true);
+  input?.setAttribute("placeholder", "Workflow iniciando. Se falhar, tente novamente.");
+});
 refreshMetrics();
 setInterval(refreshMetrics, 15000);
