@@ -1,38 +1,124 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Agente Chat</title>
+    <title>AI Agent Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@200..700,0..1,20..48" rel="stylesheet" />
     <link rel="stylesheet" href="./style.css" />
     <script src="./script.js" defer></script>
   </head>
 
   <body>
-    <div class="wrap">
-      <div class="shell">
-        <div class="topbar">
-          <div class="brand">
-            <div class="logo"></div>
-            <div>
-              <div><strong>Agente Chat</strong></div>
-              <div style="opacity: 0.7; font-size: 12px">Conectado ao backend</div>
-            </div>
-          </div>
-          <div class="status"><span class="dot"></span><span>Online</span></div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-block">
+          <h1>AI Agent</h1>
+          <p>Developer Tool</p>
         </div>
 
-        <div id="chat" class="chat"></div>
+        <nav class="side-nav">
+          <a class="side-item active" href="#">
+            <span class="material-symbols-outlined">chat</span>
+            Chat
+          </a>
+          <a class="side-item" href="#">
+            <span class="material-symbols-outlined">list_alt</span>
+            Logs
+          </a>
+          <a class="side-item" href="#">
+            <span class="material-symbols-outlined">info</span>
+            About Project
+          </a>
+        </nav>
 
-        <form id="form" class="composer" autocomplete="off">
-          <input
-            id="input"
-            placeholder="Digite sua mensagem..."
-            autocomplete="off"
-          />
-          <button id="send" type="submit">Enviar</button>
-        </form>
-      </div>
+        <div class="build-info">
+          <p class="kicker">BUILD INFO</p>
+          <p>Portfolio project</p>
+          <p class="muted">React + Tailwind + LLM App</p>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <h2>AI Agent</h2>
+          <div class="topbar-actions">
+            <button class="icon-btn" aria-label="Terminal"><span class="material-symbols-outlined">terminal</span></button>
+            <button class="icon-btn" aria-label="Code"><span class="material-symbols-outlined">code</span></button>
+            <span class="status-pill"><span class="status-dot"></span>NODE_01 CONNECTED</span>
+          </div>
+        </header>
+
+        <section class="content-grid">
+          <section class="chat-stage">
+            <div id="chat" class="chat custom-scrollbar"></div>
+
+            <div class="composer-wrap">
+              <form id="form" class="composer" autocomplete="off">
+                <input id="input" autocomplete="off" placeholder="Ask AI about logs, code, or metrics..." />
+                <button id="send" type="submit" aria-label="Enviar">
+                  <span class="material-symbols-outlined">send</span>
+                </button>
+              </form>
+            </div>
+          </section>
+
+          <aside class="intel-panel">
+            <section class="metrics">
+              <h3>PERFORMANCE METRICS</h3>
+              <article class="metric-card">
+                <div>
+                  <p>Total Executions</p>
+                  <strong>12,842</strong>
+                </div>
+                <span class="material-symbols-outlined">terminal</span>
+              </article>
+              <article class="metric-card">
+                <div>
+                  <p>Critical Errors</p>
+                  <strong class="danger">12</strong>
+                </div>
+                <span class="material-symbols-outlined danger">warning</span>
+              </article>
+              <article class="metric-card">
+                <div>
+                  <p>Avg Response Time</p>
+                  <strong class="accent">248ms</strong>
+                </div>
+                <span class="material-symbols-outlined accent">speed</span>
+              </article>
+            </section>
+
+            <section class="logs">
+              <div class="logs-head">
+                <h3>CHANGELOG</h3>
+                <span class="live-pill">LATEST</span>
+              </div>
+              <div class="logs-list custom-scrollbar">
+                <div class="log-item">
+                  <span class="time">2026-03-14</span>
+                  <p><b>v1.1.2 · reliability</b> Agente passou a responder com fallback amigável quando o n8n fica indisponível (reduz erro 500 para o usuário).</p>
+                </div>
+                <div class="log-item">
+                  <span class="time">2026-03-11</span>
+                  <p><b>v1.1.0 · infra</b> Persistência migrada para Supabase Postgres, mantendo histórico de interações mesmo após reinícios no Render.</p>
+                </div>
+                <div class="log-item">
+                  <span class="time">2026-03-10</span>
+                  <p><b>v1.0.8 · backend</b> Endpoint principal consolidado em resposta textual com parsing robusto da resposta do n8n.</p>
+                </div>
+                <div class="log-item">
+                  <span class="time">2026-03-09</span>
+                  <p><b>v1.0.7 · ux</b> Renderização markdown melhorada no chat (listas numeradas e bullets) para respostas mais legíveis.</p>
+                </div>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </main>
     </div>
   </body>
 </html>
