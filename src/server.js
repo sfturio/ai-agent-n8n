@@ -20,6 +20,8 @@ const publicDir = path.join(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
 app.get("/", (req, res) => {
+  // Best-effort wakeup when users open the app. This is throttled in the service layer.
+  warmupN8NService({ force: false }).catch(() => {});
   res.sendFile(path.join(publicDir, "index.html"));
 });
 

@@ -12,6 +12,7 @@ const metricCriticalErrors = document.getElementById("metric-critical-errors");
 const metricAvgResponseTime = document.getElementById("metric-avg-response-time");
 let providerReady = false;
 let readinessInFlight = null;
+let warmupIntervalId = null;
 
 function setComposerEnabled(enabled) {
   if (button) button.disabled = !enabled;
@@ -259,6 +260,16 @@ async function ensureProviderReady() {
   return readinessInFlight;
 }
 
+function triggerBackgroundWakeup() {
+  warmupProvider();
+  ensureProviderReady().then((ready) => {
+    if (ready && warmupIntervalId) {
+      clearInterval(warmupIntervalId);
+      warmupIntervalId = null;
+    }
+  });
+}
+
 async function sendMessage() {
   const ready = await ensureProviderReady();
   if (!ready) {
@@ -353,11 +364,24 @@ input.addEventListener("keydown", (e) => {
 
 input.addEventListener("focus", () => {
   input.setAttribute("placeholder", "");
+  triggerBackgroundWakeup();
 });
 
 input.addEventListener("blur", () => {
   if (!input.value.trim()) {
     input.setAttribute("placeholder", defaultInputPlaceholder);
+  }
+});
+
+input.addEventListener("input", () => {
+  if (!providerReady) {
+    triggerBackgroundWakeup();
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && !providerReady) {
+    triggerBackgroundWakeup();
   }
 });
 
@@ -384,5 +408,13 @@ ensureProviderReady().finally(() => {
   setComposerEnabled(true);
   input?.setAttribute("placeholder", "Workflow iniciando. Se falhar, tente novamente.");
 });
+warmupIntervalId = setInterval(() => {
+  if (providerReady) {
+    clearInterval(warmupIntervalId);
+    warmupIntervalId = null;
+    return;
+  }
+  triggerBackgroundWakeup();
+}, 12000);
 refreshMetrics();
 setInterval(refreshMetrics, 15000);
