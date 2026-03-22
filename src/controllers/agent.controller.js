@@ -46,6 +46,12 @@ export async function handleAgent(req, res) {
     }
 
     const normalizedMessage = message.trim();
+    const readiness = await ensureN8NReady();
+    if (!readiness?.ok) {
+      console.warn("n8n readiness check failed before processing message:", readiness);
+      throw new Error("failed to reach n8n webhook");
+    }
+
     const reply = await processMessage(normalizedMessage);
     const durationMs = Date.now() - startedAt;
     trackRuntimeExecution({ ok: true, durationMs });
