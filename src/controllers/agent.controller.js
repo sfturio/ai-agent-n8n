@@ -1,4 +1,4 @@
-import { ensureN8NReady, getN8NReadiness, processMessage, warmupN8NService } from "../services/agent.service.js";
+import { processMessage } from "../services/agent.service.js";
 import { getInteractionMetrics, saveInteractionLog } from "../services/supabase-log.service.js";
 
 const runtimeMetrics = {
@@ -38,7 +38,6 @@ export async function handleAgent(req, res) {
   try {
     const { message } = req.body ?? {};
 
-    // input validation
     if (typeof message !== "string" || message.trim().length === 0) {
       return res.status(400).json({
         ok: false,
@@ -47,12 +46,6 @@ export async function handleAgent(req, res) {
     }
 
     const normalizedMessage = message.trim();
-    const readiness = await ensureN8NReady();
-    if (!readiness?.ok) {
-      console.warn("n8n readiness check failed before processing message:", readiness);
-      warmupN8NService({ force: false }).catch(() => {});
-    }
-
     const reply = await processMessage(normalizedMessage);
     const durationMs = Date.now() - startedAt;
     trackRuntimeExecution({ ok: true, durationMs });
@@ -64,7 +57,6 @@ export async function handleAgent(req, res) {
       errorMessage: null,
     });
 
-    // Resposta em texto puro para a UI comportar como chat tradicional
     return res.status(200).type("text/plain; charset=utf-8").send(reply);
   } catch (error) {
     const incomingMessage = typeof req.body?.message === "string" ? req.body.message.trim() : null;
@@ -80,19 +72,16 @@ export async function handleAgent(req, res) {
       errorMessage: upstreamUnavailable ? `${error?.message ?? "unknown error"} | fallback_response` : error?.message ?? "unknown error",
     });
 
-    // Log completo no servidor (Render logs)
     console.error("Agent controller error:", {
       message: error?.message,
       name: error?.name,
       stack: process.env.NODE_ENV === "production" ? undefined : error?.stack,
     });
 
-    // Degrada com resposta de fallback para manter o chat funcional.
     if (upstreamUnavailable) {
       return res.status(200).type("text/plain; charset=utf-8").send(fallback);
     }
 
-    // Resposta controlada no cliente para erros nao previstos.
     return res.status(500).json({
       ok: false,
       error: "internal server error",
@@ -122,33 +111,5 @@ export async function getAgentMetrics(req, res) {
     avgResponseTimeMs,
     durationSampleSize: runtimeMetrics.samples,
     source: "runtime",
-  });
-}
-
-export async function warmupAgentProvider(req, res) {
-  const result = await warmupN8NService({ force: false });
-  return res.status(202).json({
-    ok: true,
-    ...result,
-  });
-}
-
-export async function getAgentProviderReadiness(req, res) {
-  const readyOnly = String(req.query?.check || "").toLowerCase() === "true";
-
-  if (readyOnly) {
-    const readiness = getN8NReadiness();
-    return res.status(200).json({
-      ok: true,
-      ...readiness,
-      source: "cache",
-    });
-  }
-
-  const result = await ensureN8NReady();
-  const status = result.ok ? 200 : 503;
-  return res.status(status).json({
-    ok: result.ok,
-    ...result,
   });
 }

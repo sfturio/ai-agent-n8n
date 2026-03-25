@@ -10,18 +10,6 @@ const defaultInputPlaceholder = input?.getAttribute("placeholder") || "";
 const metricTotalExecutions = document.getElementById("metric-total-executions");
 const metricCriticalErrors = document.getElementById("metric-critical-errors");
 const metricAvgResponseTime = document.getElementById("metric-avg-response-time");
-let providerReady = false;
-let readinessInFlight = null;
-let warmupIntervalId = null;
-let lastWakeupAttemptAt = 0;
-let backgroundWakeupCount = 0;
-const WAKEUP_MIN_INTERVAL_MS = 20000;
-const MAX_BACKGROUND_WAKEUPS = 4;
-
-function setComposerEnabled(enabled) {
-  if (button) button.disabled = !enabled;
-  if (input) input.disabled = !enabled;
-}
 
 function showView(target) {
   const views = {
@@ -141,12 +129,7 @@ function addBotMessageMarkdown(text) {
 
 let activeTypeTimer = null;
 
-function typeMessage(
-  text,
-  sender,
-  speed = 12,
-  { finalizeMarkdown = false } = {},
-) {
+function typeMessage(text, sender, speed = 12, { finalizeMarkdown = false } = {}) {
   if (activeTypeTimer) {
     clearInterval(activeTypeTimer);
     activeTypeTimer = null;
@@ -235,61 +218,7 @@ async function refreshMetrics() {
   }
 }
 
-async function warmupProvider() {
-  try {
-    await fetch("/api/agent/warmup", { method: "GET" });
-  } catch {
-    // Warmup is best-effort only.
-  }
-}
-
-async function ensureProviderReady() {
-  if (providerReady) return true;
-  if (readinessInFlight) return readinessInFlight;
-
-  readinessInFlight = (async () => {
-    try {
-      const res = await fetch("/api/agent/ready", { method: "GET" });
-      const data = await res.json().catch(() => ({}));
-      providerReady = Boolean(data?.ok || data?.ready);
-      return providerReady;
-    } catch {
-      providerReady = false;
-      return false;
-    } finally {
-      readinessInFlight = null;
-    }
-  })();
-
-  return readinessInFlight;
-}
-
-function triggerBackgroundWakeup({ force = false } = {}) {
-  const now = Date.now();
-  if (!force && now - lastWakeupAttemptAt < WAKEUP_MIN_INTERVAL_MS) {
-    return;
-  }
-
-  lastWakeupAttemptAt = now;
-  backgroundWakeupCount += 1;
-  warmupProvider();
-  ensureProviderReady().then((ready) => {
-    if (ready && warmupIntervalId) {
-      clearInterval(warmupIntervalId);
-      warmupIntervalId = null;
-    }
-  });
-}
-
 async function sendMessage() {
-  const ready = await ensureProviderReady();
-  if (!ready) {
-    typeMessage("Fluxo de automacao ainda inicializando. Tente novamente em alguns segundos.", "bot", 12, {
-      finalizeMarkdown: false,
-    });
-    return;
-  }
-
   const text = input.value.trim();
   if (!text) return;
 
@@ -332,19 +261,16 @@ async function sendMessage() {
     const reply = extractReply(data, raw);
 
     if (!res.ok) {
-      typeMessage(
-        firstNonEmptyString(data?.error, reply, "Erro ao falar com o agente."),
-        "bot",
-        12,
-        { finalizeMarkdown: false },
-      );
+      typeMessage(firstNonEmptyString(data?.error, reply, "Erro ao falar com o agente."), "bot", 12, {
+        finalizeMarkdown: false,
+      });
       return;
     }
 
     typeMessage(reply || "Nao recebi resposta do agente.", "bot", 10, {
       finalizeMarkdown: true,
     });
-  } catch (err) {
+  } catch {
     if (typingEl?.isConnected) typingEl.remove();
     typeMessage("Erro de conexao com o servidor.", "bot", 12, {
       finalizeMarkdown: false,
@@ -352,6 +278,7 @@ async function sendMessage() {
   } finally {
     button.disabled = false;
     input.disabled = false;
+    input?.setAttribute("placeholder", defaultInputPlaceholder);
     refreshMetrics();
   }
 }
@@ -383,12 +310,6 @@ input.addEventListener("blur", () => {
   }
 });
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && !providerReady) {
-    triggerBackgroundWakeup();
-  }
-});
-
 menuItems.forEach((item) => {
   item.addEventListener("click", (e) => {
     e.preventDefault();
@@ -398,32 +319,5 @@ menuItems.forEach((item) => {
 
 setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e comportamento da aplicacao."), 400);
 setTimeout(() => addBotMessageMarkdown("Se quiser, posso detalhar os pontos do changelog ou da arquitetura do projeto."), 950);
-setComposerEnabled(false);
-input?.setAttribute("placeholder", "Inicializando workflow...");
-triggerBackgroundWakeup({ force: true });
-ensureProviderReady().finally(() => {
-  if (providerReady) {
-    setComposerEnabled(true);
-    input?.setAttribute("placeholder", defaultInputPlaceholder);
-    return;
-  }
-
-  // Allow manual retry even if readiness check fails.
-  setComposerEnabled(true);
-  input?.setAttribute("placeholder", "Workflow iniciando. Se falhar, tente novamente.");
-});
-warmupIntervalId = setInterval(() => {
-  if (providerReady) {
-    clearInterval(warmupIntervalId);
-    warmupIntervalId = null;
-    return;
-  }
-  if (backgroundWakeupCount >= MAX_BACKGROUND_WAKEUPS) {
-    clearInterval(warmupIntervalId);
-    warmupIntervalId = null;
-    return;
-  }
-  triggerBackgroundWakeup();
-}, 20000);
 refreshMetrics();
 setInterval(refreshMetrics, 15000);

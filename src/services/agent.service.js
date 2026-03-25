@@ -7,19 +7,11 @@ const WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 const MAX_RETRIES = Number(process.env.N8N_RETRY_MAX || 2);
 const RETRY_BASE_DELAY_MS = Number(process.env.N8N_RETRY_BASE_DELAY_MS || 800);
 const REQUEST_TIMEOUT_MS = Number(process.env.N8N_REQUEST_TIMEOUT_MS || 45000);
-const WARMUP_URL = process.env.N8N_WARMUP_URL;
-const WARMUP_TIMEOUT_MS = Number(process.env.N8N_WARMUP_TIMEOUT_MS || 8000);
 const COLD_START_RETRY_DELAY_MS = Number(process.env.N8N_COLD_START_RETRY_DELAY_MS || 3500);
-const WARMUP_METHOD = String(process.env.N8N_WARMUP_METHOD || "GET").toUpperCase();
-const READY_TTL_MS = Number(process.env.N8N_READY_TTL_MS || 120000);
-const WARMUP_MAX_WAIT_MS = Number(process.env.N8N_WARMUP_MAX_WAIT_MS || 30000);
-const WARMUP_POLL_INTERVAL_MS = Number(process.env.N8N_WARMUP_POLL_INTERVAL_MS || 3000);
 const RATE_LIMIT_COOLDOWN_MS = Number(process.env.N8N_RATE_LIMIT_COOLDOWN_MS || 15000);
 const MAX_TOTAL_WAIT_MS = Number(process.env.N8N_MAX_TOTAL_WAIT_MS || 90000);
 const MIN_429_DELAY_MS = Number(process.env.N8N_429_MIN_DELAY_MS || 4000);
 
-let lastWarmupAt = 0;
-let lastWarmupSuccessAt = 0;
 let rateLimitedUntil = 0;
 
 function safeJson(value, maxLen = 2000) {
@@ -57,13 +49,7 @@ function extractReplyText(payload) {
   if (direct) return direct;
 
   if (payload.data && typeof payload.data === "object") {
-    const nested = firstNonEmptyString(
-      payload.data.reply,
-      payload.data.message,
-      payload.data.content,
-      payload.data.data,
-    );
-
+    const nested = firstNonEmptyString(payload.data.reply, payload.data.message, payload.data.content, payload.data.data);
     if (nested) return nested;
   }
 
@@ -104,125 +90,9 @@ async function postToN8N(message) {
   );
 }
 
-function resolveWarmupUrl() {
-  if (typeof WARMUP_URL === "string" && WARMUP_URL.trim().length > 0) {
-    return WARMUP_URL.trim();
-  }
-
-  if (typeof WEBHOOK_URL !== "string" || WEBHOOK_URL.trim().length === 0) {
-    return "";
-  }
-
-  try {
-    return new URL(WEBHOOK_URL).origin;
-  } catch {
-    return "";
-  }
-}
-
 function shouldRetryForColdStart(error) {
   const code = String(error?.code ?? "").toUpperCase();
   return code === "ECONNABORTED" || code === "ECONNRESET" || code === "EAI_AGAIN" || code === "ETIMEDOUT";
-}
-
-export async function warmupN8NService({ force = false } = {}) {
-  const warmupTarget = resolveWarmupUrl();
-  if (!warmupTarget) {
-    return { ok: false, skipped: true, reason: "missing_warmup_url" };
-  }
-
-  const now = Date.now();
-  if (!force && now - lastWarmupAt < 15_000) {
-    const readiness = getN8NReadiness();
-    return { ok: readiness.ready, skipped: true, reason: "throttled", readiness };
-  }
-  lastWarmupAt = now;
-
-  try {
-    const requestConfig = {
-      timeout: WARMUP_TIMEOUT_MS,
-      validateStatus: () => true,
-    };
-
-    const res =
-      WARMUP_METHOD === "POST"
-        ? await axios.post(warmupTarget, { warmup: true }, { ...requestConfig, headers: { "Content-Type": "application/json" } })
-        : await axios.get(warmupTarget, requestConfig);
-
-    const isOk = res.status >= 200 && res.status < 300;
-    const isThrottledButReachable = res.status === 429;
-    if (isOk || isThrottledButReachable) {
-      lastWarmupSuccessAt = Date.now();
-    }
-
-    return {
-      ok: isOk || isThrottledButReachable,
-      skipped: false,
-      status: res.status,
-      target: warmupTarget,
-      method: WARMUP_METHOD,
-      throttled: isThrottledButReachable,
-    };
-  } catch (error) {
-    return {
-      ok: false,
-      skipped: false,
-      target: warmupTarget,
-      method: WARMUP_METHOD,
-      error: error?.message || "warmup request failed",
-    };
-  }
-}
-
-export function getN8NReadiness() {
-  const now = Date.now();
-  const ageMs = lastWarmupSuccessAt > 0 ? now - lastWarmupSuccessAt : null;
-  return {
-    ready: Number.isFinite(ageMs) && ageMs >= 0 && ageMs <= READY_TTL_MS,
-    lastSuccessAt: lastWarmupSuccessAt || null,
-    ageMs,
-    ttlMs: READY_TTL_MS,
-  };
-}
-
-export async function ensureN8NReady() {
-  const now = Date.now();
-  if (rateLimitedUntil > now) {
-    return {
-      ok: false,
-      source: "rate-limited",
-      retryAfterMs: rateLimitedUntil - now,
-      readiness: getN8NReadiness(),
-    };
-  }
-
-  const snapshot = getN8NReadiness();
-  if (snapshot.ready) {
-    return { ok: true, source: "cache", readiness: snapshot };
-  }
-
-  const startedAt = Date.now();
-  let attempts = 0;
-  let lastResult = null;
-
-  while (Date.now() - startedAt < WARMUP_MAX_WAIT_MS) {
-    attempts += 1;
-    lastResult = await warmupN8NService({ force: true });
-
-    if (lastResult?.ok) {
-      return { ok: true, source: "warmup", attempts, readiness: getN8NReadiness(), warmup: lastResult };
-    }
-
-    await sleep(WARMUP_POLL_INTERVAL_MS);
-  }
-
-  return {
-    ok: false,
-    source: "warmup-timeout",
-    attempts,
-    readiness: getN8NReadiness(),
-    warmup: lastResult,
-  };
 }
 
 export async function processMessage(message, { allowColdStartRetry = true } = {}) {
@@ -235,8 +105,7 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
   }
 
   try {
-    const startedAt = Date.now();
-    const deadlineAt = startedAt + MAX_TOTAL_WAIT_MS;
+    const deadlineAt = Date.now() + MAX_TOTAL_WAIT_MS;
     let response = null;
 
     for (let attempt = 0; attempt <= MAX_RETRIES || Date.now() < deadlineAt; attempt++) {
@@ -269,7 +138,7 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
       await sleep(delay);
     }
 
-    if (response.status >= 200 && response.status < 300) {
+    if (response?.status >= 200 && response.status < 300) {
       const replyText = extractReplyText(response.data);
 
       if (replyText) {
@@ -284,16 +153,16 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
       throw new Error("empty response from n8n");
     }
 
-    if (response.status === 429) {
+    if (response?.status === 429) {
       throw new Error("n8n temporarily rate-limited");
     }
 
     console.error("n8n webhook error response:", {
-      status: response.status,
-      data: safeJson(response.data),
+      status: response?.status,
+      data: safeJson(response?.data),
     });
 
-    throw new Error(`n8n error ${response.status}: ${safeJson(response.data)}`);
+    throw new Error(`n8n error ${response?.status}: ${safeJson(response?.data)}`);
   } catch (error) {
     const isAxios = Boolean(error?.isAxiosError);
 
@@ -306,8 +175,6 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
       });
 
       if (allowColdStartRetry && shouldRetryForColdStart(error)) {
-        const warm = await warmupN8NService({ force: true });
-        console.warn("n8n warmup before retry:", warm);
         await sleep(COLD_START_RETRY_DELAY_MS);
         return processMessage(message, { allowColdStartRetry: false });
       }
