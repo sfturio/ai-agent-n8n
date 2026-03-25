@@ -14,9 +14,11 @@ const WARMUP_METHOD = String(process.env.N8N_WARMUP_METHOD || "GET").toUpperCase
 const READY_TTL_MS = Number(process.env.N8N_READY_TTL_MS || 120000);
 const WARMUP_MAX_WAIT_MS = Number(process.env.N8N_WARMUP_MAX_WAIT_MS || 30000);
 const WARMUP_POLL_INTERVAL_MS = Number(process.env.N8N_WARMUP_POLL_INTERVAL_MS || 3000);
+const RATE_LIMIT_COOLDOWN_MS = Number(process.env.N8N_RATE_LIMIT_COOLDOWN_MS || 15000);
 
 let lastWarmupAt = 0;
 let lastWarmupSuccessAt = 0;
+let rateLimitedUntil = 0;
 
 function safeJson(value, maxLen = 2000) {
   try {
@@ -129,7 +131,8 @@ export async function warmupN8NService({ force = false } = {}) {
 
   const now = Date.now();
   if (!force && now - lastWarmupAt < 15_000) {
-    return { ok: true, skipped: true, reason: "throttled" };
+    const readiness = getN8NReadiness();
+    return { ok: readiness.ready, skipped: true, reason: "throttled", readiness };
   }
   lastWarmupAt = now;
 
@@ -181,6 +184,16 @@ export function getN8NReadiness() {
 }
 
 export async function ensureN8NReady() {
+  const now = Date.now();
+  if (rateLimitedUntil > now) {
+    return {
+      ok: false,
+      source: "rate-limited",
+      retryAfterMs: rateLimitedUntil - now,
+      readiness: getN8NReadiness(),
+    };
+  }
+
   const snapshot = getN8NReadiness();
   if (snapshot.ready) {
     return { ok: true, source: "cache", readiness: snapshot };
@@ -219,19 +232,27 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
     throw new Error("message must be a non-empty string");
   }
 
+  if (rateLimitedUntil > Date.now()) {
+    throw new Error("n8n temporarily rate-limited");
+  }
+
   try {
     let response = null;
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       response = await postToN8N(message);
 
-      if (response.status !== 429) break;
-
-      if (attempt === MAX_RETRIES) break;
+      if (response.status !== 429) {
+        rateLimitedUntil = 0;
+        break;
+      }
 
       const retryAfterHeader = response.headers?.["retry-after"];
       const retryAfterMs = parseRetryAfterMs(retryAfterHeader);
       const delay = retryAfterMs ?? backoffMs(attempt);
+      rateLimitedUntil = Math.max(rateLimitedUntil, Date.now() + Math.max(delay, RATE_LIMIT_COOLDOWN_MS));
+
+      if (attempt === MAX_RETRIES) break;
 
       console.warn("n8n returned 429, retrying...", {
         attempt: attempt + 1,
@@ -254,6 +275,10 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
       });
 
       throw new Error("empty response from n8n");
+    }
+
+    if (response.status === 429) {
+      throw new Error("n8n temporarily rate-limited");
     }
 
     console.error("n8n webhook error response:", {

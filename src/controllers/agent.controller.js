@@ -13,6 +13,7 @@ function isUpstreamUnavailable(error) {
   return (
     msg.includes("n8n webhook timeout") ||
     msg.includes("failed to reach n8n webhook") ||
+    msg.includes("temporarily rate-limited") ||
     msg.includes("n8n error") ||
     msg.includes("empty response from n8n")
   );

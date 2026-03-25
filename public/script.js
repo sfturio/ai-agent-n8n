@@ -13,6 +13,10 @@ const metricAvgResponseTime = document.getElementById("metric-avg-response-time"
 let providerReady = false;
 let readinessInFlight = null;
 let warmupIntervalId = null;
+let lastWakeupAttemptAt = 0;
+let backgroundWakeupCount = 0;
+const WAKEUP_MIN_INTERVAL_MS = 20000;
+const MAX_BACKGROUND_WAKEUPS = 4;
 
 function setComposerEnabled(enabled) {
   if (button) button.disabled = !enabled;
@@ -260,7 +264,14 @@ async function ensureProviderReady() {
   return readinessInFlight;
 }
 
-function triggerBackgroundWakeup() {
+function triggerBackgroundWakeup({ force = false } = {}) {
+  const now = Date.now();
+  if (!force && now - lastWakeupAttemptAt < WAKEUP_MIN_INTERVAL_MS) {
+    return;
+  }
+
+  lastWakeupAttemptAt = now;
+  backgroundWakeupCount += 1;
   warmupProvider();
   ensureProviderReady().then((ready) => {
     if (ready && warmupIntervalId) {
@@ -364,18 +375,11 @@ input.addEventListener("keydown", (e) => {
 
 input.addEventListener("focus", () => {
   input.setAttribute("placeholder", "");
-  triggerBackgroundWakeup();
 });
 
 input.addEventListener("blur", () => {
   if (!input.value.trim()) {
     input.setAttribute("placeholder", defaultInputPlaceholder);
-  }
-});
-
-input.addEventListener("input", () => {
-  if (!providerReady) {
-    triggerBackgroundWakeup();
   }
 });
 
@@ -396,7 +400,7 @@ setTimeout(() => addBotMessageMarkdown("Console online. Posso analisar logs e co
 setTimeout(() => addBotMessageMarkdown("Se quiser, posso detalhar os pontos do changelog ou da arquitetura do projeto."), 950);
 setComposerEnabled(false);
 input?.setAttribute("placeholder", "Inicializando workflow...");
-warmupProvider();
+triggerBackgroundWakeup({ force: true });
 ensureProviderReady().finally(() => {
   if (providerReady) {
     setComposerEnabled(true);
@@ -414,7 +418,12 @@ warmupIntervalId = setInterval(() => {
     warmupIntervalId = null;
     return;
   }
+  if (backgroundWakeupCount >= MAX_BACKGROUND_WAKEUPS) {
+    clearInterval(warmupIntervalId);
+    warmupIntervalId = null;
+    return;
+  }
   triggerBackgroundWakeup();
-}, 12000);
+}, 20000);
 refreshMetrics();
 setInterval(refreshMetrics, 15000);
