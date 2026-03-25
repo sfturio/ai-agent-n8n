@@ -1,4 +1,4 @@
-<!doctype html>
+ï»¿<!doctype html>
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
@@ -54,7 +54,7 @@
                 LinkedIn
               </a>
             </div>
-            <p class="contact-signature">© <strong>sfturio</strong></p>
+            <p class="contact-signature">ï¿½ <strong>sfturio</strong></p>
           </div>
         </div>
       </aside>
@@ -75,6 +75,12 @@
             <div id="view-chat" class="view-pane is-active">
               <div id="chat" class="chat custom-scrollbar"></div>
               <div class="composer-wrap">
+                <div class="wake-server-banner">
+                  <strong>Server asleep?</strong>
+                  Open
+                  <a href="https://n8n-render-p7xd.onrender.com" target="_blank" rel="noreferrer">n8n-render-p7xd.onrender.com</a>
+                  to wake the workflow server.
+                </div>
                 <form id="form" class="composer" autocomplete="off">
                   <input id="input" autocomplete="off" placeholder="Ask AI about logs, code, or metrics..." />
                   <button id="send" type="submit" aria-label="Enviar">
@@ -93,23 +99,23 @@
               <div class="content-list">
                 <article class="log-item">
                   <span class="time">2026-03-14</span>
-                  <p><b>v1.3.1 · ui/docs polish</b> Consolidação visual da interface, revisão do About Project e atualização completa da documentação (EN/PT-BR) com demo e informações operacionais atuais.</p>
+                  <p><b>v1.3.1 ï¿½ ui/docs polish</b> Consolidaï¿½ï¿½o visual da interface, revisï¿½o do About Project e atualizaï¿½ï¿½o completa da documentaï¿½ï¿½o (EN/PT-BR) com demo e informaï¿½ï¿½es operacionais atuais.</p>
                 </article>
                 <article class="log-item">
                   <span class="time">2026-03-14</span>
-                  <p><b>v1.3.0 · observability</b> Métricas reais adicionadas ao dashboard via <code>/api/agent/metrics</code> (execuções totais, erros críticos e tempo médio de resposta).</p>
+                  <p><b>v1.3.0 ï¿½ observability</b> Mï¿½tricas reais adicionadas ao dashboard via <code>/api/agent/metrics</code> (execuï¿½ï¿½es totais, erros crï¿½ticos e tempo mï¿½dio de resposta).</p>
                 </article>
                 <article class="log-item">
                   <span class="time">2026-03-14</span>
-                  <p><b>v1.2.1 · reliability</b> Retry com backoff para respostas 429 do n8n e rate limit por IP no endpoint do agente.</p>
+                  <p><b>v1.2.1 ï¿½ reliability</b> Retry com backoff para respostas 429 do n8n e rate limit por IP no endpoint do agente.</p>
                 </article>
                 <article class="log-item">
                   <span class="time">2026-03-11</span>
-                  <p><b>v1.2.0 · docs/ui</b> Documentação técnica reformulada (EN/PT-BR) e navegação da interface reorganizada em Chat, Changelog e About Project.</p>
+                  <p><b>v1.2.0 ï¿½ docs/ui</b> Documentaï¿½ï¿½o tï¿½cnica reformulada (EN/PT-BR) e navegaï¿½ï¿½o da interface reorganizada em Chat, Changelog e About Project.</p>
                 </article>
                 <article class="log-item">
                   <span class="time">2026-03-11</span>
-                  <p><b>v1.1.0 · infra</b> Persistência migrada para Supabase Postgres, mantendo histórico de interações mesmo após reinícios de infraestrutura.</p>
+                  <p><b>v1.1.0 ï¿½ infra</b> Persistï¿½ncia migrada para Supabase Postgres, mantendo histï¿½rico de interaï¿½ï¿½es mesmo apï¿½s reinï¿½cios de infraestrutura.</p>
                 </article>
               </div>
             </section>
@@ -120,47 +126,47 @@
                 <span class="live-pill">PRO</span>
               </div>
               <h4>AI Agent</h4>
-              <p class="about-subtitle">Assistente técnico orientado à análise operacional e automação de workflows.</p>
+              <p class="about-subtitle">Assistente tï¿½cnico orientado ï¿½ anï¿½lise operacional e automaï¿½ï¿½o de workflows.</p>
 
               <article class="about-block">
-                <h5>Visão Geral</h5>
+                <h5>Visï¿½o Geral</h5>
                 <p>
-                  O AI Agent é uma aplicação web de portfólio para demonstrar integração entre chat, automação e observabilidade.
-                  O backend em Node.js/Express envia consultas para fluxos n8n e registra interações no Supabase Postgres,
-                  permitindo análise operacional com métricas reais de uso.
+                  O AI Agent ï¿½ uma aplicaï¿½ï¿½o web de portfï¿½lio para demonstrar integraï¿½ï¿½o entre chat, automaï¿½ï¿½o e observabilidade.
+                  O backend em Node.js/Express envia consultas para fluxos n8n e registra interaï¿½ï¿½es no Supabase Postgres,
+                  permitindo anï¿½lise operacional com mï¿½tricas reais de uso.
                 </p>
               </article>
 
               <article class="about-block">
                 <h5>Arquitetura</h5>
                 <ul>
-                  <li>Backend em Node.js (Express) responsável por orquestração de requisições, controle de estado e fallback operacional.</li>
-                  <li>Integração assíncrona com n8n via webhook para processamento inteligente das consultas.</li>
-                  <li>Persistência de mensagens e metadados em Supabase Postgres, permitindo auditoria e análise histórica.</li>
-                  <li>Deploy em Render, com separação de variáveis de ambiente e execução isolada por serviço.</li>
+                  <li>Backend em Node.js (Express) responsï¿½vel por orquestraï¿½ï¿½o de requisiï¿½ï¿½es, controle de estado e fallback operacional.</li>
+                  <li>Integraï¿½ï¿½o assï¿½ncrona com n8n via webhook para processamento inteligente das consultas.</li>
+                  <li>Persistï¿½ncia de mensagens e metadados em Supabase Postgres, permitindo auditoria e anï¿½lise histï¿½rica.</li>
+                  <li>Deploy em Render, com separaï¿½ï¿½o de variï¿½veis de ambiente e execuï¿½ï¿½o isolada por serviï¿½o.</li>
                 </ul>
               </article>
 
               <article class="about-block">
-                <h5>Diferenciais Técnicos</h5>
+                <h5>Diferenciais Tï¿½cnicos</h5>
                 <ul>
-                  <li>Fallback interno resiliente, mantendo a experiência funcional mesmo em indisponibilidade do fluxo externo.</li>
-                  <li>Estratégia de retry com backoff e rate limit por IP, aumentando estabilidade sob carga ou falhas transitórias.</li>
-                  <li>Arquitetura desacoplada e extensível, preparada para troca futura de provedores de IA ou novos fluxos de automação.</li>
-                  <li>Registro estruturado de interações e métricas operacionais em tempo real no dashboard.</li>
+                  <li>Fallback interno resiliente, mantendo a experiï¿½ncia funcional mesmo em indisponibilidade do fluxo externo.</li>
+                  <li>Estratï¿½gia de retry com backoff e rate limit por IP, aumentando estabilidade sob carga ou falhas transitï¿½rias.</li>
+                  <li>Arquitetura desacoplada e extensï¿½vel, preparada para troca futura de provedores de IA ou novos fluxos de automaï¿½ï¿½o.</li>
+                  <li>Registro estruturado de interaï¿½ï¿½es e mï¿½tricas operacionais em tempo real no dashboard.</li>
                 </ul>
               </article>
 
               <article class="about-block">
                 <h5>Roadmap</h5>
                 <ul>
-                  <li>Evolução do dashboard com histórico temporal e filtros analíticos avançados.</li>
-                  <li>Integração com múltiplas fontes operacionais (logs, eventos e sistemas externos).</li>
-                  <li>Aprimoramento da trilha de auditoria e qualidade das respostas com métricas comparativas.</li>
+                  <li>Evoluï¿½ï¿½o do dashboard com histï¿½rico temporal e filtros analï¿½ticos avanï¿½ados.</li>
+                  <li>Integraï¿½ï¿½o com mï¿½ltiplas fontes operacionais (logs, eventos e sistemas externos).</li>
+                  <li>Aprimoramento da trilha de auditoria e qualidade das respostas com mï¿½tricas comparativas.</li>
                 </ul>
               </article>
 
-              <p class="about-status">Status atual: versão v1.3.1 em operação estável, com foco contínuo em confiabilidade arquitetural e evolução incremental.</p>
+              <p class="about-status">Status atual: versï¿½o v1.3.1 em operaï¿½ï¿½o estï¿½vel, com foco contï¿½nuo em confiabilidade arquitetural e evoluï¿½ï¿½o incremental.</p>
 
             </section>
           </section>

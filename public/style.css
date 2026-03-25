@@ -313,6 +313,30 @@ body {
   padding-top: 14px;
 }
 
+.wake-server-banner {
+  margin: 0 2px 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(123, 208, 255, 0.12);
+  border: 1px solid rgba(123, 208, 255, 0.32);
+  color: #d8f2ff;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.wake-server-banner strong {
+  color: #f0f9ff;
+}
+
+.wake-server-banner a {
+  color: #9eddff;
+  font-weight: 600;
+}
+
+.wake-server-banner a:hover {
+  color: #cdf0ff;
+}
+
 .composer-note {
   margin: 8px 2px 0;
   font-size: 11px;
