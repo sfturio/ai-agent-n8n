@@ -145,16 +145,18 @@ export async function warmupN8NService({ force = false } = {}) {
         : await axios.get(warmupTarget, requestConfig);
 
     const isOk = res.status >= 200 && res.status < 300;
-    if (isOk) {
+    const isThrottledButReachable = res.status === 429;
+    if (isOk || isThrottledButReachable) {
       lastWarmupSuccessAt = Date.now();
     }
 
     return {
-      ok: isOk,
+      ok: isOk || isThrottledButReachable,
       skipped: false,
       status: res.status,
       target: warmupTarget,
       method: WARMUP_METHOD,
+      throttled: isThrottledButReachable,
     };
   } catch (error) {
     return {
