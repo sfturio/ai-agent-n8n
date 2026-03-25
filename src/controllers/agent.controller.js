@@ -50,7 +50,7 @@ export async function handleAgent(req, res) {
     const readiness = await ensureN8NReady();
     if (!readiness?.ok) {
       console.warn("n8n readiness check failed before processing message:", readiness);
-      throw new Error("failed to reach n8n webhook");
+      warmupN8NService({ force: false }).catch(() => {});
     }
 
     const reply = await processMessage(normalizedMessage);

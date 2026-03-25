@@ -15,6 +15,8 @@ const READY_TTL_MS = Number(process.env.N8N_READY_TTL_MS || 120000);
 const WARMUP_MAX_WAIT_MS = Number(process.env.N8N_WARMUP_MAX_WAIT_MS || 30000);
 const WARMUP_POLL_INTERVAL_MS = Number(process.env.N8N_WARMUP_POLL_INTERVAL_MS || 3000);
 const RATE_LIMIT_COOLDOWN_MS = Number(process.env.N8N_RATE_LIMIT_COOLDOWN_MS || 15000);
+const MAX_TOTAL_WAIT_MS = Number(process.env.N8N_MAX_TOTAL_WAIT_MS || 90000);
+const MIN_429_DELAY_MS = Number(process.env.N8N_429_MIN_DELAY_MS || 4000);
 
 let lastWarmupAt = 0;
 let lastWarmupSuccessAt = 0;
@@ -232,14 +234,19 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
     throw new Error("message must be a non-empty string");
   }
 
-  if (rateLimitedUntil > Date.now()) {
-    throw new Error("n8n temporarily rate-limited");
-  }
-
   try {
+    const startedAt = Date.now();
+    const deadlineAt = startedAt + MAX_TOTAL_WAIT_MS;
     let response = null;
 
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    for (let attempt = 0; attempt <= MAX_RETRIES || Date.now() < deadlineAt; attempt++) {
+      if (rateLimitedUntil > Date.now()) {
+        const waitMs = Math.min(rateLimitedUntil - Date.now(), Math.max(0, deadlineAt - Date.now()));
+        if (waitMs > 0) {
+          await sleep(waitMs);
+        }
+      }
+
       response = await postToN8N(message);
 
       if (response.status !== 429) {
@@ -249,10 +256,10 @@ export async function processMessage(message, { allowColdStartRetry = true } = {
 
       const retryAfterHeader = response.headers?.["retry-after"];
       const retryAfterMs = parseRetryAfterMs(retryAfterHeader);
-      const delay = retryAfterMs ?? backoffMs(attempt);
+      const delay = Math.max(retryAfterMs ?? backoffMs(attempt), MIN_429_DELAY_MS);
       rateLimitedUntil = Math.max(rateLimitedUntil, Date.now() + Math.max(delay, RATE_LIMIT_COOLDOWN_MS));
 
-      if (attempt === MAX_RETRIES) break;
+      if (Date.now() >= deadlineAt) break;
 
       console.warn("n8n returned 429, retrying...", {
         attempt: attempt + 1,
